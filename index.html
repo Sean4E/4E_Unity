@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4E Unity Journeys</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07080f;--surface:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--text:#e8eaf0;--dim:#7a7f96;--mono:'Space Mono',monospace;--display:'Syne',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--display);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.015) 1px,transparent 1px);background-size:60px 60px}
+.badge{display:inline-block;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--dim);font-family:var(--mono);font-size:10px;letter-spacing:3px;text-transform:uppercase;padding:5px 16px;border-radius:100px;margin-bottom:20px}
+h1{font-size:clamp(32px,6vw,56px);font-weight:800;letter-spacing:-2px;margin-bottom:12px;text-align:center}
+.sub{color:var(--dim);font-size:15px;margin-bottom:40px;text-align:center;max-width:500px;line-height:1.7}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;max-width:1100px;width:100%;position:relative;z-index:1}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 24px;text-decoration:none;color:var(--text);transition:all 0.25s;backdrop-filter:blur(8px);display:flex;flex-direction:column;gap:10px}
+.card:hover{transform:translateY(-4px);border-color:var(--accent)}
+.card .icon{font-size:28px}
+.card h2{font-size:20px;font-weight:800;letter-spacing:-0.5px}
+.card p{font-size:13px;color:var(--dim);line-height:1.7}
+.card .tag{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;margin-top:auto;padding-top:8px}
+.card-green{--accent:#84cc16}.card-green .tag{color:#84cc16}.card-green:hover{border-color:#84cc16;background:rgba(132,204,22,0.04)}
+.card-cyan{--accent:#22d3ee}.card-cyan .tag{color:#22d3ee}.card-cyan:hover{border-color:#22d3ee;background:rgba(34,211,238,0.04)}
+.card-orange{--accent:#f97316}.card-orange .tag{color:#f97316}.card-orange:hover{border-color:#f97316;background:rgba(249,115,22,0.04)}
+.card-pink{--accent:#ec4899}.card-pink .tag{color:#ec4899}.card-pink:hover{border-color:#ec4899;background:rgba(236,72,153,0.04)}
+.scripts-section{max-width:1100px;width:100%;margin-top:40px;position:relative;z-index:1}
+.scripts-section h3{font-size:16px;font-weight:700;color:var(--dim);margin-bottom:14px;font-family:var(--mono);font-size:12px;letter-spacing:2px;text-transform:uppercase}
+.script-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.script-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--text);transition:all 0.2s;display:flex;align-items:center;gap:10px}
+.script-card:hover{border-color:#84cc16;background:rgba(132,204,22,0.04);transform:translateY(-2px)}
+.script-card .s-icon{font-size:20px}
+.script-card .s-name{font-family:var(--mono);font-size:11px;font-weight:700}
+.script-card .s-desc{font-size:10px;color:var(--dim)}
+footer{margin-top:50px;text-align:center;color:var(--dim);font-family:var(--mono);font-size:10px;letter-spacing:1px;position:relative;z-index:1}
+@media(max-width:600px){.grid{grid-template-columns:1fr}.script-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="badge">Immersive Environments &middot; Week 9</div>
+<h1>4E Unity Journeys</h1>
+<p class="sub">Build-along guides for Unity. Pick a journey below and follow step by step. No prior experience needed.</p>
+
+<div class="grid">
+  <a href="Unity_Journey/unity-journey.html" class="card card-green">
+    <div class="icon">&#127918;</div>
+    <h2>Unity Journey</h2>
+    <p>Build an interactive first-person scene &mdash; shapes, lights, materials, interactions. Same ideas as Three.js, now in a game engine.</p>
+    <div class="tag">Interactive Scene &rarr;</div>
+  </a>
+  <a href="Unity_Journey/unity-canvas-journey.html" class="card card-cyan">
+    <div class="icon">&#128444;</div>
+    <h2>Canvas Journey</h2>
+    <p>Build user interfaces in Unity &mdash; buttons, sliders, panels, health bars, pause menus. Everything visual, interactive demos included.</p>
+    <div class="tag">UI Foundations &rarr;</div>
+  </a>
+  <a href="Unity_Journey/unity-ar-journey.html" class="card card-orange">
+    <div class="icon">&#128241;</div>
+    <h2>AR Journey</h2>
+    <p>Build augmented reality with AR Foundation &mdash; detect surfaces, place objects, touch interactions. Deploy to phone.</p>
+    <div class="tag">AR Foundation &rarr;</div>
+  </a>
+  <a href="Unity_Journey/unity-vuforia-journey.html" class="card card-pink">
+    <div class="icon">&#128247;</div>
+    <h2>Vuforia Journey</h2>
+    <p>Image-based AR with Vuforia &mdash; test with your webcam in the Unity Editor. No phone required.</p>
+    <div class="tag">Webcam AR &rarr;</div>
+  </a>
+</div>
+
+<div class="scripts-section">
+  <h3>Companion Scripts (Unity Journey)</h3>
+  <div class="script-grid">
+    <a href="Scripts/PlayerController.cs" download class="script-card">
+      <div class="s-icon">&#127918;</div>
+      <div><div class="s-name">PlayerController.cs</div><div class="s-desc">First-person movement</div></div>
+    </a>
+    <a href="Scripts/Interactable.cs" download class="script-card">
+      <div class="s-icon">&#128073;</div>
+      <div><div class="s-name">Interactable.cs</div><div class="s-desc">Press E to interact</div></div>
+    </a>
+    <a href="Scripts/Door.cs" download class="script-card">
+      <div class="s-icon">&#128682;</div>
+      <div><div class="s-name">Door.cs</div><div class="s-desc">Open/close doors</div></div>
+    </a>
+    <a href="Scripts/Pickup.cs" download class="script-card">
+      <div class="s-icon">&#11088;</div>
+      <div><div class="s-name">Pickup.cs</div><div class="s-desc">Collect items + score</div></div>
+    </a>
+    <a href="Scripts/LightSwitch.cs" download class="script-card">
+      <div class="s-icon">&#128161;</div>
+      <div><div class="s-name">LightSwitch.cs</div><div class="s-desc">Toggle lights on/off</div></div>
+    </a>
+    <a href="Scripts/TriggerZone.cs" download class="script-card">
+      <div class="s-icon">&#9889;</div>
+      <div><div class="s-name">TriggerZone.cs</div><div class="s-desc">Area-based events</div></div>
+    </a>
+  </div>
+</div>
+
+<footer>4E Virtual Design &middot; Immersive Environments Module &middot; CCT University of Galway</footer>
+</body>
+</html>

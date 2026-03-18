@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unity Vuforia Journey - AR with Image Tracking</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07080f;--surface:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--accent:#ec4899;--accent2:#f97316;--accent3:#22d3ee;--accent4:#34d399;--text:#e8eaf0;--dim:#7a7f96;--code-bg:rgba(0,0,0,0.5);--mono:'Space Mono',monospace;--display:'Syne',sans-serif}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--display);line-height:1.7}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(236,72,153,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(236,72,153,0.02) 1px,transparent 1px);background-size:60px 60px}
+.hero{position:relative;padding:70px 40px 30px;text-align:center;z-index:1}
+.hero-badge{display:inline-block;background:rgba(236,72,153,0.15);border:1px solid rgba(236,72,153,0.3);color:var(--accent);font-family:var(--mono);font-size:11px;letter-spacing:3px;text-transform:uppercase;padding:6px 18px;border-radius:100px;margin-bottom:24px}
+.hero h1{font-size:clamp(34px,6vw,68px);font-weight:800;line-height:1.05;letter-spacing:-2px;margin-bottom:16px}
+.hero h1 .pink{color:var(--accent)}
+.hero p{font-size:16px;color:var(--dim);max-width:620px;margin:0 auto 12px;line-height:1.8}
+.hero-sub{font-family:var(--mono);font-size:11px;color:#3f4460;letter-spacing:1px}
+.nav{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:0 40px 40px;z-index:1;position:relative}
+.nav a{background:var(--surface);border:1px solid var(--border);color:var(--dim);font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:100px;text-decoration:none;transition:all 0.2s;letter-spacing:0.5px}
+.nav a:hover,.nav a.active{background:rgba(236,72,153,0.15);border-color:rgba(236,72,153,0.4);color:var(--accent)}
+.nav-div{width:100%;text-align:center;font-family:var(--mono);font-size:10px;color:#2a2d3a;letter-spacing:2px;padding:4px 0}
+.wrap{max-width:1100px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+.lesson{margin-bottom:50px}
+.lesson-head{display:flex;align-items:flex-start;gap:16px;margin-bottom:20px}
+.lesson-num{font-family:var(--mono);font-size:12px;color:var(--accent);background:rgba(236,72,153,0.12);border:1px solid rgba(236,72,153,0.25);padding:4px 10px;border-radius:6px;white-space:nowrap;margin-top:5px}
+.lesson-title{font-size:clamp(20px,3vw,30px);font-weight:800;letter-spacing:-1px;line-height:1.1}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px 26px;margin-bottom:16px;backdrop-filter:blur(8px)}
+.card p{font-size:15px;color:#c5cad8;line-height:1.85}
+.card strong{color:var(--accent);font-weight:700}
+.card .cyan{color:var(--accent3)}
+.card .orange{color:var(--accent2)}
+.card .green{color:var(--accent4)}
+.card .pink{color:var(--accent)}
+.analogy{background:rgba(167,139,250,0.06);border-left:3px solid #a78bfa;padding:12px 18px;border-radius:0 10px 10px 0;margin:12px 0;font-size:14px;color:#b8a5e8;font-style:italic}
+.unity-note{background:rgba(236,72,153,0.06);border-left:3px solid var(--accent);padding:10px 16px;border-radius:0 10px 10px 0;margin:12px 0 0;font-size:13px;color:#e88aaf;font-style:italic}
+.warn-note{background:rgba(255,60,60,0.06);border-left:3px solid #ff6b6b;padding:10px 16px;border-radius:0 10px 10px 0;margin:12px 0 0;font-size:13px;color:#e88a7d;font-style:italic}
+.success-note{background:rgba(52,211,153,0.06);border-left:3px solid var(--accent4);padding:10px 16px;border-radius:0 10px 10px 0;margin:12px 0 0;font-size:13px;color:#7de8b8;font-style:italic}
+.code-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.code-label{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:1px;text-transform:uppercase}
+.cbtn{background:var(--surface);border:1px solid var(--border);color:var(--dim);font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:5px;cursor:pointer;transition:all 0.2s}
+.cbtn:hover{color:var(--accent);border-color:rgba(236,72,153,0.3)}
+.cbtn.ok{border-color:#4ade80;color:#4ade80;background:rgba(74,222,128,0.1)}
+pre{background:var(--code-bg);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:18px 20px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.85;color:var(--text);margin-bottom:16px;white-space:pre}
+code{font-family:inherit}
+.kw{color:#c792ea}.st{color:#c3e88d}.nm{color:#f78c6c}.cm{color:#546e7a;font-style:italic}.ty{color:#22d3ee}.fn{color:#34d399}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.two>div{min-width:0}
+@media(max-width:850px){.two{grid-template-columns:1fr}.hero{padding:50px 20px 20px}.nav{padding:0 16px 24px}.wrap{padding:0 14px}pre{font-size:11px;padding:14px}}
+.ctrl{margin-top:8px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px}
+.ctrl label{color:var(--dim);font-size:11px;font-family:var(--mono);white-space:nowrap}
+.ctrl input[type="range"]{width:70px;accent-color:var(--accent)}
+.ctrl select{background:var(--code-bg);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:3px 6px;font-size:11px;font-family:var(--mono)}
+.ctrl .vv{color:var(--dim);font-family:var(--mono);font-size:11px;min-width:28px}
+.btn{padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--dim);font-size:11px;font-family:var(--mono);cursor:pointer;transition:all 0.15s}
+.btn:hover{border-color:var(--accent);color:var(--text)}
+.btn.primary{background:var(--accent);color:#07080f;border-color:var(--accent);font-weight:700}
+.shape-btn{padding:4px 8px;border-radius:5px;border:1px solid var(--border);background:var(--surface);color:var(--dim);font-size:10px;font-family:var(--mono);cursor:pointer;transition:all 0.15s}
+.shape-btn:hover,.shape-btn.active{border-color:var(--accent);color:var(--text);background:rgba(236,72,153,0.12)}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:40px 0}
+.part-div{max-width:1100px;margin:30px auto 20px;padding:0 24px}
+.part-inner{border:1px solid var(--border);border-radius:12px;padding:20px 24px;text-align:center;background:linear-gradient(135deg,rgba(236,72,153,0.06),transparent)}
+.part-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:3px;color:var(--accent);margin-bottom:4px}
+.part-title{font-size:22px;font-weight:800;margin-bottom:4px}
+.part-desc{color:var(--dim);font-size:14px}
+footer{text-align:center;padding:36px 24px;color:var(--dim);font-family:var(--mono);font-size:11px;border-top:1px solid var(--border);margin-top:50px;position:relative;z-index:1}
+
+/* -- Demo Boxes -- */
+.demo-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:16px;position:relative;overflow:hidden}
+.demo-label{position:absolute;top:8px;right:10px;font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;z-index:2}
+.mock-viewport{background:#3c3c3c;border-radius:8px;min-height:200px;display:flex;align-items:center;justify-content:center;position:relative;border:1px solid #555}
+.mock-viewport-label{position:absolute;top:6px;left:10px;font-size:9px;color:rgba(255,255,255,0.25);font-family:var(--mono)}
+.state-indicator{font-family:var(--mono);font-size:11px;color:var(--accent);margin-top:8px;text-align:center}
+
+/* -- Inspector Mockup -- */
+.inspector{background:#1e2129;border:1px solid #3a3f52;border-radius:8px;overflow:hidden;font-family:var(--display);margin:12px 0}
+.inspector-header{background:#282c36;padding:7px 12px;font-size:11px;font-weight:700;color:#e8eaf0;display:flex;align-items:center;gap:6px;border-bottom:1px solid #3a3f52}
+.inspector-header .arrow{color:var(--accent);font-size:10px}
+.inspector-row{display:flex;align-items:center;padding:4px 12px;border-bottom:1px solid rgba(255,255,255,0.03);font-size:11px}
+.inspector-label{color:#8890aa;width:120px;flex-shrink:0;font-family:var(--mono);font-size:10px}
+.inspector-val{color:#c9d1e0;flex:1;font-family:var(--mono);font-size:11px}
+.inspector-val .highlight{color:var(--accent);font-weight:700}
+.inspector-val .fake-input{background:#282c36;border:1px solid #3a3f52;border-radius:3px;color:#c9d1e0;padding:2px 8px;font-size:10px;font-family:var(--mono);width:60px}
+
+/* -- Hierarchy Mockup -- */
+.hierarchy{background:#1e2129;border:1px solid #3a3f52;border-radius:8px;overflow:hidden;margin:12px 0}
+.hierarchy-title{background:#282c36;padding:7px 12px;font-size:11px;font-weight:700;color:#e8eaf0;border-bottom:1px solid #3a3f52;display:flex;align-items:center;gap:6px}
+.hierarchy-item{display:flex;align-items:center;gap:6px;padding:3px 8px;font-size:11px;color:#a0a8c0;font-family:var(--mono)}
+.hierarchy-item.selected{background:rgba(236,72,153,0.1);color:var(--accent)}
+.hierarchy-item .indent{display:inline-block}
+
+/* -- Comparison Table -- */
+.compare-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px}
+.compare-table th{background:rgba(236,72,153,0.1);color:var(--accent);font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:8px 12px;text-align:left;border-bottom:2px solid rgba(236,72,153,0.2)}
+.compare-table td{padding:6px 12px;border-bottom:1px solid var(--border);color:#c5cad8;font-family:var(--mono);font-size:11px}
+.compare-table tr:hover td{background:rgba(255,255,255,0.02)}
+
+/* -- Webcam Frame -- */
+.webcam-frame{width:100%;max-width:460px;margin:0 auto;background:linear-gradient(170deg,#4a4a5a 0%,#3a3a4a 40%,#2a2a3a 100%);border-radius:12px;min-height:280px;overflow:hidden;position:relative;border:1px solid #555}
+.webcam-label{position:absolute;top:8px;left:10px;font-family:var(--mono);font-size:8px;color:rgba(255,255,255,0.2);letter-spacing:1px;z-index:5}
+.webcam-rec{position:absolute;top:8px;right:10px;font-family:var(--mono);font-size:8px;color:rgba(255,60,60,0.4);z-index:5}
+
+/* -- Target Image -- */
+.target-image{position:absolute;bottom:60px;left:50%;transform:translateX(-50%) perspective(300px) rotateX(40deg);width:140px;height:100px;border:2px dashed rgba(236,72,153,0.5);background:repeating-conic-gradient(rgba(236,72,153,0.05) 0% 25%, transparent 0% 50%) 0 0/20px 20px;border-radius:4px;transition:all 0.3s}
+.target-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--mono);font-size:8px;color:rgba(236,72,153,0.4);text-align:center;letter-spacing:1px}
+
+/* -- AR Object -- */
+.ar-object{width:30px;height:30px;position:absolute;transition:all 0.3s ease;z-index:4}
+.ar-cube{background:var(--accent);border:2px solid rgba(255,255,255,0.3);box-shadow:0 4px 12px rgba(236,72,153,0.4)}
+.ar-sphere{background:var(--accent3);border:2px solid rgba(255,255,255,0.3);border-radius:50%;box-shadow:0 4px 12px rgba(34,211,238,0.4)}
+.ar-cylinder{background:var(--accent4);border:2px solid rgba(255,255,255,0.3);border-radius:4px 4px 50% 50%;box-shadow:0 4px 12px rgba(52,211,153,0.4)}
+
+/* -- Star Rating -- */
+.star-rating{display:inline-flex;gap:2px;font-size:14px}
+.star-rating .star{color:rgba(236,72,153,0.3)}
+.star-rating .star.filled{color:var(--accent)}
+
+/* -- Scale-in Animation -- */
+@keyframes scaleIn{0%{transform:scale(0) translateX(-50%)}40%{transform:scale(1.15) translateX(-50%)}70%{transform:scale(0.95) translateX(-50%)}100%{transform:scale(1) translateX(-50%)}}
+@keyframes bobFloat{0%,100%{transform:translateY(0) translateX(-50%)}50%{transform:translateY(-6px) translateX(-50%)}}
+@keyframes spinY{0%{transform:translateX(-50%) rotateY(0deg)}100%{transform:translateX(-50%) rotateY(360deg)}}
+.scale-in{animation:scaleIn 0.5s ease-out forwards}
+.bob-float{animation:bobFloat 2s ease-in-out infinite}
+
+/* -- Checklist -- */
+.checklist{max-width:1100px;margin:30px auto;padding:0 24px}
+.checklist-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px 28px}
+.checklist-card h2{font-size:20px;font-weight:800;margin-bottom:14px;color:var(--accent)}
+.checklist-item{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:14px;color:#c5cad8;cursor:pointer;user-select:none}
+.checklist-item input[type="checkbox"]{accent-color:var(--accent);width:16px;height:16px;cursor:pointer}
+.checklist-item.checked{color:var(--dim);text-decoration:line-through}
+
+/* -- Flow Chart -- */
+.flow-chart{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;padding:16px;font-family:var(--mono);font-size:11px}
+.flow-node{padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);text-align:center;min-width:80px}
+.flow-node.start{border-color:var(--accent);background:rgba(236,72,153,0.1);color:var(--accent)}
+.flow-node.yes{border-color:var(--accent4);background:rgba(52,211,153,0.1);color:var(--accent4)}
+.flow-node.no{border-color:#ff6b6b;background:rgba(255,60,60,0.1);color:#ff6b6b}
+.flow-node.action{border-color:var(--accent3);background:rgba(34,211,238,0.1);color:var(--accent3)}
+.flow-arrow{color:var(--dim);font-size:16px}
+.flow-label{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-badge">Build-Along Guide</div>
+  <h1>Unity <span class="pink">Vuforia</span> Journey</h1>
+  <p>Build augmented reality with image tracking &mdash; test directly in the Unity Editor using your webcam. No phone required.</p>
+  <div class="hero-sub">Part 1: Setup &middot; Part 2: Build It &middot; Bonus: Advanced</div>
+</div>
+
+<div class="nav">
+  <div class="nav-div">-- Part 1: Setup --</div>
+  <a href="#s0">00 What is Vuforia</a>
+  <a href="#s1">01 Account Setup</a>
+  <a href="#s2">02 Unity Project</a>
+  <a href="#s3">03 AR Camera</a>
+  <a href="#s4">04 Image Targets</a>
+  <div class="nav-div">-- Part 2: Build It --</div>
+  <a href="#s5">05 Place Content</a>
+  <a href="#s6">06 Multiple Targets</a>
+  <a href="#s7">07 Animations</a>
+  <a href="#s8">08 UI Overlay</a>
+  <div class="nav-div">-- Bonus --</div>
+  <a href="#s9">09 Ground Plane</a>
+  <a href="#s10">10 Build &amp; Deploy</a>
+  <a href="#checklist">Checklist</a>
+</div>
+
+<!-- ══ PART 1 ══ -->
+<div class="part-div"><div class="part-inner">
+  <div class="part-label">Part 1 of 2</div>
+  <div class="part-title">Setup</div>
+  <p class="part-desc">Five steps. Learn what Vuforia is, create your account, install it in Unity, and set up image targets.</p>
+</div></div>
+
+<div class="wrap">
+
+<!-- ── 00 ── -->
+<section class="lesson" id="s0">
+  <div class="lesson-head"><span class="lesson-num">00</span><h2 class="lesson-title">What is Vuforia?</h2></div>
+  <div class="card">
+    <p><strong>Vuforia</strong> is an image-based AR engine. Your camera recognises printed images and overlays 3D content on top of them. Unlike AR Foundation which detects surfaces, Vuforia locks content to <strong class="cyan">specific images</strong> you choose.</p>
+    <div class="analogy">Vuforia is like a QR code scanner for 3D. Print an image, point your camera at it, 3D content appears anchored to it. Move the image, the 3D content follows.</div>
+  </div>
+
+  <div class="card">
+    <p><strong>The killer feature:</strong> Vuforia works in the Unity Editor with your webcam. No phone build required. Press Play, hold up your printed image, and see AR content immediately.</p>
+    <p style="margin-top:10px"><strong>Use cases:</strong> product demos, museum exhibits, educational materials, business cards, packaging, textbook augmentation.</p>
+  </div>
+
+  <div class="card">
+    <p><strong>Comparison: AR technologies</strong></p>
+    <table class="compare-table">
+      <thead><tr><th>Feature</th><th>Vuforia</th><th>AR Foundation</th><th>WebXR</th></tr></thead>
+      <tbody>
+        <tr><td>Tracking type</td><td>Image-based</td><td>Surface-based</td><td>Browser-based</td></tr>
+        <tr><td>Editor testing</td><td style="color:var(--accent4)">&#10003; Webcam</td><td style="color:#ff6b6b">&#10007; Phone only</td><td style="color:var(--accent4)">&#10003; Browser</td></tr>
+        <tr><td>Image tracking</td><td style="color:var(--accent4)">&#10003; Excellent</td><td style="color:var(--accent4)">&#10003; Good</td><td style="color:#ff6b6b">&#10007; Limited</td></tr>
+        <tr><td>Plane detection</td><td style="color:var(--accent2)">~ Limited</td><td style="color:var(--accent4)">&#10003; Excellent</td><td style="color:var(--accent4)">&#10003; Good</td></tr>
+        <tr><td>Free for dev</td><td style="color:var(--accent4)">&#10003; Yes</td><td style="color:var(--accent4)">&#10003; Yes</td><td style="color:var(--accent4)">&#10003; Yes</td></tr>
+        <tr><td>Best for</td><td>Image markers</td><td>Surface AR</td><td>Web distribution</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Interactive Demo: Webcam view with target -->
+  <div class="demo-box">
+    <div class="demo-label">LIVE PREVIEW</div>
+    <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;justify-content:center">
+      <div class="webcam-frame" id="demo00" style="max-width:340px;min-height:240px">
+        <div class="webcam-label">WEBCAM FEED</div>
+        <div class="webcam-rec">REC &#9679;</div>
+        <div class="target-image" id="target00">
+          <div class="target-label">IMAGE<br>TARGET</div>
+        </div>
+        <div id="object00" style="position:absolute;bottom:120px;left:50%;transform:translateX(-50%);width:40px;height:40px;background:var(--accent);border:2px solid rgba(255,255,255,0.3);box-shadow:0 6px 20px rgba(236,72,153,0.5);transition:all 0.3s;opacity:1"></div>
+        <div id="status00" style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:10px;color:var(--accent4);letter-spacing:1px;white-space:nowrap">&#10003; TARGET TRACKED</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;min-width:160px">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:1px;margin-bottom:4px">TOGGLE STATE</div>
+        <button class="btn" id="toggleTracked00">Toggle Tracked / Lost</button>
+        <div class="state-indicator" id="state00">Status: Tracked</div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- ── 01 ── -->
+<section class="lesson" id="s1">
+  <div class="lesson-head"><span class="lesson-num">01</span><h2 class="lesson-title">Account Setup</h2></div>
+  <div class="card">
+    <p><strong>Step 1:</strong> Go to <span class="cyan">developer.vuforia.com</span> and create a free account.</p>
+    <p><strong>Step 2:</strong> Navigate to <strong>License Manager</strong> &rarr; <strong>Get Development Key</strong>. Give it a name and copy the key.</p>
+    <div class="unity-note"><strong>License types:</strong> Basic (free) = unlimited for development and testing. Classic = paid for commercial distribution. Start with Basic &mdash; it's all you need.</div>
+  </div>
+
+  <div class="card">
+    <p><strong>Step 3:</strong> Go to <strong>Target Manager</strong> &rarr; <strong>Add Database</strong> &rarr; choose <strong>Device</strong> type.</p>
+    <p><strong>Step 4:</strong> Click into your database &rarr; <strong>Add Target</strong> &rarr; upload an image file (JPG/PNG).</p>
+    <p style="margin-top:8px">Vuforia will analyse your image and give it a <strong>star rating</strong> (0&ndash;5). Higher = better tracking.</p>
+  </div>
+
+  <div class="card">
+    <p><strong>What makes a good target?</strong></p>
+    <table class="compare-table">
+      <thead><tr><th>Good Targets</th><th>Bad Targets</th></tr></thead>
+      <tbody>
+        <tr><td style="color:var(--accent4)">Rich in detail and contrast</td><td style="color:#ff6b6b">Plain or solid colours</td></tr>
+        <tr><td style="color:var(--accent4)">No repetitive patterns</td><td style="color:#ff6b6b">Repeating tiles or stripes</td></tr>
+        <tr><td style="color:var(--accent4)">Unique features well distributed</td><td style="color:#ff6b6b">All detail in one corner</td></tr>
+        <tr><td style="color:var(--accent4)">Magazine covers, textbook pages</td><td style="color:#ff6b6b">Plain white paper, simple logos</td></tr>
+        <tr><td style="color:var(--accent4)">High resolution image file</td><td style="color:#ff6b6b">Blurry or low-res photo</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <p><strong>Star rating system:</strong></p>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="star-rating"><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span></div>
+        <span style="color:var(--accent4);font-family:var(--mono);font-size:11px">Excellent &mdash; rock-solid tracking</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="star-rating"><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span></div>
+        <span style="color:var(--accent2);font-family:var(--mono);font-size:11px">Good &mdash; works well in most conditions</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="star-rating"><span class="star filled">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span></div>
+        <span style="color:#ff6b6b;font-family:var(--mono);font-size:11px">Poor &mdash; unreliable, choose a different image</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p><strong>Step 5:</strong> Once your targets are uploaded and rated, click <strong>Download Database</strong> &rarr; choose <strong>Unity Editor</strong> format. This downloads a <code style="background:var(--code-bg);padding:2px 6px;border-radius:3px;font-size:12px">.unitypackage</code> file.</p>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- ── 02 ── -->
+<section class="lesson" id="s2">
+  <div class="lesson-head"><span class="lesson-num">02</span><h2 class="lesson-title">Unity Project</h2></div>
+  <div class="card">
+    <p><strong>Create a new 3D URP project</strong> in Unity Hub. Then install Vuforia Engine.</p>
+    <p style="margin-top:8px"><strong>Install:</strong> Window &rarr; Package Manager &rarr; <strong>+</strong> (top-left) &rarr; <strong>Add package by name</strong> &rarr; enter:</p>
+    <pre style="margin-top:8px;margin-bottom:8px"><code>com.ptc.vuforia.engine</code></pre>
+  </div>
+
+  <div class="card">
+    <div class="inspector">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> Package Manager</div>
+      <div class="inspector-row"><div class="inspector-label">Vuforia Engine</div><div class="inspector-val"><span class="highlight">10.x.x</span> &mdash; AR image tracking engine</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p><strong>Import your target database:</strong> Assets &rarr; Import Package &rarr; Custom Package &rarr; select the <code style="background:var(--code-bg);padding:2px 6px;border-radius:3px;font-size:12px">.unitypackage</code> you downloaded from the Vuforia portal.</p>
+    <p style="margin-top:8px"><strong>Delete the default Main Camera</strong> &mdash; the Vuforia AR Camera will replace it.</p>
+    <div class="warn-note"><strong>Don't mix Vuforia and AR Foundation in the same scene.</strong> They conflict. Use Vuforia in one scene, AR Foundation in another if you need both.</div>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- ── 03 ── -->
+<section class="lesson" id="s3">
+  <div class="lesson-head"><span class="lesson-num">03</span><h2 class="lesson-title">AR Camera</h2></div>
+  <div class="card">
+    <p>Add the Vuforia AR Camera: <strong>GameObject</strong> &rarr; <strong>Vuforia Engine</strong> &rarr; <strong>AR Camera</strong>.</p>
+    <p style="margin-top:8px">This replaces Unity's Main Camera. It renders the webcam feed as the background and handles all Vuforia tracking.</p>
+    <div class="unity-note"><strong>The AR Camera replaces Unity's Main Camera</strong> &mdash; it renders the webcam feed as the background and manages all tracking.</div>
+  </div>
+
+  <div class="card">
+    <div class="inspector">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> Vuforia Behaviour</div>
+      <div class="inspector-row"><div class="inspector-label">World Center</div><div class="inspector-val"><span class="highlight">SPECIFIC_TARGET</span></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p><strong>Paste your License Key:</strong> Select the AR Camera &rarr; Inspector &rarr; <strong>Open Vuforia Engine Configuration</strong>:</p>
+    <div class="inspector">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> Vuforia Configuration</div>
+      <div class="inspector-row"><div class="inspector-label">App License Key</div><div class="inspector-val"><span class="highlight">paste-your-key-here</span></div></div>
+      <div class="inspector-row"><div class="inspector-label">Camera Device</div><div class="inspector-val"><span class="highlight">MODE_DEFAULT</span></div></div>
+      <div class="inspector-row"><div class="inspector-label">Max Simultaneous</div><div class="inspector-val"><span class="highlight">1</span></div></div>
+    </div>
+    <div class="unity-note"><strong>Camera Device Mode:</strong> MODE_DEFAULT uses your primary webcam. On laptops with multiple cameras, you can switch in the Vuforia Configuration.</div>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- ── 04 ── -->
+<section class="lesson" id="s4">
+  <div class="lesson-head"><span class="lesson-num">04</span><h2 class="lesson-title">Image Targets</h2></div>
+  <div class="card">
+    <p>Add an image target: <strong>GameObject</strong> &rarr; <strong>Vuforia Engine</strong> &rarr; <strong>Image Target</strong>.</p>
+    <p style="margin-top:8px">Select it in the Inspector and configure:</p>
+    <div class="inspector">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> Image Target Behaviour</div>
+      <div class="inspector-row"><div class="inspector-label">Type</div><div class="inspector-val"><span class="highlight">From Database</span></div></div>
+      <div class="inspector-row"><div class="inspector-label">Database</div><div class="inspector-val"><span class="highlight">MyTargets</span></div></div>
+      <div class="inspector-row"><div class="inspector-label">Image Target</div><div class="inspector-val">magazine_cover</div></div>
+      <div class="inspector-row"><div class="inspector-label">Width</div><div class="inspector-val"><span class="highlight">0.21</span> <span style="color:#8890aa;font-size:10px">(metres &mdash; A4 width)</span></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p><strong>Width</strong> = the real-world size of your printed image in metres. If you print on A4, the width is approximately <strong>0.21m</strong>. Getting this right ensures your 3D content scales correctly.</p>
+    <p style="margin-top:8px">The target image appears as a flat plane in the Scene view &mdash; this is where your 3D content will appear when tracked.</p>
+    <div class="unity-note"><strong>Printing tips:</strong> A4 minimum size, matte paper works better than glossy (less reflections), ensure good contrast. You can also display the image on a tablet or second screen.</div>
+  </div>
+
+  <!-- Interactive Demo: Scene view with target, dropdown to switch targets -->
+  <div class="demo-box">
+    <div class="demo-label">LIVE PREVIEW</div>
+    <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;justify-content:center">
+      <div class="mock-viewport" id="sceneView04" style="width:300px;min-height:200px;flex-shrink:0">
+        <div class="mock-viewport-label">SCENE VIEW</div>
+        <div id="targetPlane04" style="position:absolute;bottom:40px;left:50%;transform:translateX(-50%) perspective(400px) rotateX(55deg);width:160px;height:110px;border:2px solid rgba(236,72,153,0.4);background:repeating-conic-gradient(rgba(236,72,153,0.06) 0% 25%, transparent 0% 50%) 0 0/16px 16px;border-radius:4px;transition:all 0.3s">
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--mono);font-size:9px;color:rgba(236,72,153,0.5);text-align:center;letter-spacing:1px" id="targetName04">Target A</div>
+        </div>
+        <div style="position:absolute;bottom:8px;right:8px;display:flex;align-items:center;gap:4px">
+          <div class="star-rating" id="stars04"><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star filled">&#9733;</span><span class="star">&#9733;</span></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;min-width:160px">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:1px;margin-bottom:4px">SELECT TARGET</div>
+        <button class="shape-btn active" id="tgtA04">Target A (4 stars)</button>
+        <button class="shape-btn" id="tgtB04">Target B (5 stars)</button>
+        <button class="shape-btn" id="tgtC04">Target C (2 stars)</button>
+        <div class="state-indicator" id="state04">Target A &middot; Rating: 4/5</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<!-- ══ PART 2 ══ -->
+<div class="part-div"><div class="part-inner">
+  <div class="part-label">Part 2 of 2</div>
+  <div class="part-title">Build It</div>
+  <p class="part-desc">Four steps. Place 3D content on targets, handle multiple targets, add animations, and build UI.</p>
+</div></div>
+
+<div class="wrap">
+
+<!-- ── 05 ── -->
+<section class="lesson" id="s5">
+  <div class="lesson-head"><span class="lesson-num">05</span><h2 class="lesson-title">Place Content</h2></div>
+  <div class="card">
+    <p>Add 3D objects as <strong>children</strong> of the ImageTarget in the Hierarchy. That's it &mdash; any child of the ImageTarget will appear when the target is tracked and disappear when it's lost.</p>
+    <div class="hierarchy">
+      <div class="hierarchy-title">Hierarchy</div>
+      <div class="hierarchy-item"><span class="indent" style="width:0"></span>&#9654; AR Camera</div>
+      <div class="hierarchy-item selected"><span class="indent" style="width:0"></span>&#127919; ImageTarget</div>
+      <div class="hierarchy-item"><span class="indent" style="width:20px"></span>&#128230; Cube</div>
+      <div class="hierarchy-item"><span class="indent" style="width:20px"></span>&#128308; Sphere</div>
+      <div class="hierarchy-item"><span class="indent" style="width:20px"></span>&#128311; Imported Model</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p>Scale and position the child objects relative to the target. The target plane is at Y=0 &mdash; so Y&gt;0 makes objects float above it.</p>
+    <p style="margin-top:8px"><strong>Press Play</strong> &rarr; point your webcam at the printed image &rarr; your 3D content appears on top!</p>
+    <div class="success-note"><strong>You just built AR with zero code!</strong> Everything is parented in the Hierarchy &mdash; no scripts needed for basic placement.</div>
+  </div>
+
+  <!-- Interactive Demo: Webcam view, add objects -->
+  <div class="demo-box">
+    <div class="demo-label">LIVE PREVIEW</div>
+    <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;justify-content:center">
+      <div class="webcam-frame" id="demo05" style="max-width:340px;min-height:260px">
+        <div class="webcam-label">WEBCAM FEED</div>
+        <div class="webcam-rec">REC &#9679;</div>
+        <div class="target-image" id="target05">
+          <div class="target-label">IMAGE<br>TARGET</div>
+        </div>
+        <div id="objectArea05" style="position:absolute;bottom:110px;left:50%;transform:translateX(-50%);width:120px;height:60px;display:flex;align-items:flex-end;justify-content:center;gap:8px"></div>
+        <div id="status05" style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:10px;color:var(--accent4);letter-spacing:1px;white-space:nowrap">&#10003; TARGET TRACKED</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;min-width:160px">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:1px;margin-bottom:4px">ADD OBJECTS</div>
+        <button class="btn" id="addCube05" style="border-color:var(--accent);color:var(--accent)">+ Add Cube</button>
+        <button class="btn" id="addSphere05" style="border-color:var(--accent3);color:var(--accent3)">+ Add Sphere</button>
+        <button class="btn" id="addCylinder05" style="border-color:var(--accent4);color:var(--accent4)">+ Add Cylinder</button>
+        <button class="btn" id="clear05" style="border-color:#ff6b6b;color:#ff6b6b;margin-top:4px">Clear All</button>
+        <div class="ctrl" style="margin-top:4px">
+          <label>Scale:</label>
+          <input type="range" id="scale05" min="15" max="50" value="28">
+          <span class="vv" id="scaleVal05">1.0x</span>
+        </div>
+        <div class="state-indicator" id="state05">Objects: 0</div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- ── 06 ── -->
+<section class="lesson" id="s6">
+  <div class="lesson-head"><span class="lesson-num">06</span><h2 class="lesson-title">Multiple Targets</h2></div>
+  <div class="card">
+    <p>Add multiple <strong>ImageTarget</strong> GameObjects &mdash; each linked to a different image in your database. Each target shows different 3D content.</p>
+    <p style="margin-top:8px"><strong>Increase simultaneous tracking:</strong> In the Vuforia Configuration, set <strong>Max Simultaneous Tracked Images</strong> from 1 to 4.</p>
+    <div class="inspector">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> Vuforia Configuration</div>
+      <div class="inspector-row"><div class="inspector-label">Max Simultaneous</div><div class="inspector-val"><span class="highlight">4</span></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p><strong>Detect which target is active:</strong></p>
+    <div class="code-head">
+      <span class="code-label">C# &mdash; MultiTargetHandler.cs</span>
+      <div><button class="cbtn" onclick="copyEl('code-06')">Copy</button></div>
+    </div>
+    <pre><code id="code-06"><span class="kw">using</span> UnityEngine;
+<span class="kw">using</span> Vuforia;
+
+<span class="kw">public class</span> <span class="ty">MultiTargetHandler</span> : <span class="ty">MonoBehaviour</span>
+{
+    <span class="kw">void</span> <span class="fn">Start</span>()
+    {
+        <span class="kw">var</span> observers = FindObjectsOfType&lt;<span class="ty">ObserverBehaviour</span>&gt;();
+        <span class="kw">foreach</span> (<span class="kw">var</span> obs <span class="kw">in</span> observers)
+            obs.OnTargetStatusChanged += <span class="fn">OnStatusChanged</span>;
+    }
+
+    <span class="kw">void</span> <span class="fn">OnStatusChanged</span>(<span class="ty">ObserverBehaviour</span> behaviour, <span class="ty">TargetStatus</span> status)
+    {
+        <span class="kw">string</span> targetName = behaviour.TargetName;
+        <span class="kw">bool</span> tracked = status.Status == <span class="ty">Status</span>.TRACKED ||
+                       status.Status == <span class="ty">Status</span>.EXTENDED_TRACKED;
+
+        Debug.Log(<span class="st">$"{targetName}: {(tracked ? "Found" : "Lost")}"</span>);
+    }
+}</code></pre>
+  </div>
+
+  <!-- Interactive Demo: Two targets -->
+  <div class="demo-box">
+    <div class="demo-label">LIVE PREVIEW</div>
+    <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;justify-content:center">
+      <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+        <div style="text-align:center">
+          <div style="width:140px;height:100px;background:#2a2a3a;border:2px dashed rgba(236,72,153,0.4);border-radius:6px;display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;transition:all 0.3s" id="targetA06">
+            <div style="font-family:var(--mono);font-size:9px;color:rgba(236,72,153,0.5);letter-spacing:1px">TARGET A</div>
+            <div id="objA06" style="position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:28px;height:28px;background:var(--accent);border:2px solid rgba(255,255,255,0.3);box-shadow:0 4px 12px rgba(236,72,153,0.4);transition:all 0.3s;opacity:1"></div>
+          </div>
+          <div style="font-family:var(--mono);font-size:10px;margin-top:6px" id="statusA06"><span style="color:var(--accent4)">&#10003; TRACKED</span></div>
+        </div>
+        <div style="text-align:center">
+          <div style="width:140px;height:100px;background:#2a2a3a;border:2px dashed rgba(34,211,238,0.4);border-radius:6px;display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;transition:all 0.3s" id="targetB06">
+            <div style="font-family:var(--mono);font-size:9px;color:rgba(34,211,238,0.5);letter-spacing:1px">TARGET B</div>
+            <div id="objB06" style="position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:28px;height:28px;background:var(--accent3);border:2px solid rgba(255,255,255,0.3);border-radius:50%;box-shadow:0 4px 12px rgba(34,211,238,0.4);transition:all 0.3s;opacity:1"></div>
+          </div>
+          <div style="font-family:var(--mono);font-size:10px;margin-top:6px" id="statusB06"><span style="color:var(--accent4)">&#10003; TRACKED</span></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;min-width:160px">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:1px;margin-bottom:4px">TOGGLE TARGETS</div>
+        <button class="btn" id="toggleA06" style="border-color:var(--accent);color:var(--accent)">Toggle Target A</button>
+        <button class="btn" id="toggleB06" style="border-color:var(--accent3);color:var(--accent3)">Toggle Target B</button>
+        <div class="state-indicator" id="state06">A: Tracked &middot; B: Tracked</div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- ── 07 ── -->
+<section class="lesson" id="s7">
+  <div class="lesson-head"><span class="lesson-num">07</span><h2 class="lesson-title">Animations on Target Found</h2></div>
+  <div class="card">
+    <p>Play an animation when the target is detected, and stop it when the target is lost. Use <strong>OnTargetStatusChanged</strong> to trigger animations.</p>
+  </div>
+
+  <div class="card">
+    <div class="code-head">
+      <span class="code-label">C# &mdash; TargetAnimator.cs</span>
+      <div><button class="cbtn" onclick="copyEl('code-07')">Copy</button></div>
+    </div>
+    <pre><code id="code-07"><span class="kw">using</span> UnityEngine;
+<span class="kw">using</span> Vuforia;
+
+<span class="kw">public class</span> <span class="ty">TargetAnimator</span> : <span class="ty">MonoBehaviour</span>
+{
+    <span class="kw">public</span> <span class="ty">Animator</span> animator;
+    <span class="kw">public</span> <span class="kw">string</span> triggerName = <span class="st">"Play"</span>;
+
+    <span class="kw">void</span> <span class="fn">Start</span>()
+    {
+        GetComponent&lt;<span class="ty">ObserverBehaviour</span>&gt;()
+            .OnTargetStatusChanged += <span class="fn">OnStatus</span>;
+    }
+
+    <span class="kw">void</span> <span class="fn">OnStatus</span>(<span class="ty">ObserverBehaviour</span> b, <span class="ty">TargetStatus</span> status)
+    {
+        <span class="kw">bool</span> found = status.Status == <span class="ty">Status</span>.TRACKED;
+
+        <span class="kw">if</span> (found)
+        {
+            animator.SetTrigger(triggerName);
+            <span class="cm">// Scale-up entrance effect</span>
+            StartCoroutine(<span class="fn">ScaleIn</span>());
+        }
+    }
+
+    System.Collections.<span class="ty">IEnumerator</span> <span class="fn">ScaleIn</span>()
+    {
+        transform.localScale = <span class="ty">Vector3</span>.zero;
+        <span class="kw">float</span> t = <span class="nm">0</span>;
+        <span class="kw">while</span> (t &lt; <span class="nm">1f</span>)
+        {
+            t += Time.deltaTime * <span class="nm">3f</span>;
+            transform.localScale = <span class="ty">Vector3</span>.Lerp(
+                <span class="ty">Vector3</span>.zero, <span class="ty">Vector3</span>.one,
+                Mathf.SmoothStep(<span class="nm">0</span>, <span class="nm">1</span>, t));
+            <span class="kw">yield return null</span>;
+        }
+    }
+}</code></pre>
+  </div>
+
+  <div class="card">
+    <div class="inspector">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> TargetAnimator (Script)</div>
+      <div class="inspector-row"><div class="inspector-label">Animator</div><div class="inspector-val"><span class="highlight">CubeAnimator</span></div></div>
+      <div class="inspector-row"><div class="inspector-label">Trigger Name</div><div class="inspector-val"><span class="highlight">Play</span></div></div>
+    </div>
+    <div class="unity-note"><strong>Animation ideas:</strong> Scale-in bounce, continuous spin, gentle bob/float. Combine these for polished results.</div>
+  </div>
+
+  <!-- Interactive Demo: Scale-in animation -->
+  <div class="demo-box">
+    <div class="demo-label">LIVE PREVIEW</div>
+    <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;justify-content:center">
+      <div style="width:200px;height:160px;background:#2a2a3a;border-radius:8px;display:flex;align-items:center;justify-content:center;position:relative;border:1px solid #555">
+        <div id="animObj07" style="width:50px;height:50px;background:var(--accent);border:2px solid rgba(255,255,255,0.3);box-shadow:0 6px 20px rgba(236,72,153,0.5);transition:none;transform:scale(0)"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;min-width:160px">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:1px;margin-bottom:4px">TRIGGER ANIMATION</div>
+        <button class="btn primary" id="triggerScale07">Target Found (Scale In)</button>
+        <button class="btn" id="triggerBob07" style="border-color:var(--accent3);color:var(--accent3)">Toggle Bob Float</button>
+        <button class="btn" id="resetAnim07" style="border-color:#ff6b6b;color:#ff6b6b">Target Lost (Reset)</button>
+        <div class="state-indicator" id="state07">Status: Lost</div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- ── 08 ── -->
+<section class="lesson" id="s8">
+  <div class="lesson-head"><span class="lesson-num">08</span><h2 class="lesson-title">UI Overlay</h2></div>
+  <div class="card">
+    <p>Add a <strong>Canvas (Screen Space &mdash; Overlay)</strong> for instructions and status. Show "Scanning..." when no target is found, and "Target Found!" when tracked.</p>
+    <div class="unity-note"><strong>See the <a href="unity-canvas-journey.html" style="color:var(--accent3)">Canvas Journey</a></strong> for full UI details. Here we cover the Vuforia-specific bits.</div>
+  </div>
+
+  <div class="card">
+    <div class="code-head">
+      <span class="code-label">C# &mdash; ARUIController.cs</span>
+      <div><button class="cbtn" onclick="copyEl('code-08')">Copy</button></div>
+    </div>
+    <pre><code id="code-08"><span class="kw">using</span> UnityEngine;
+<span class="kw">using</span> TMPro;
+<span class="kw">using</span> Vuforia;
+
+<span class="kw">public class</span> <span class="ty">ARUIController</span> : <span class="ty">MonoBehaviour</span>
+{
+    <span class="kw">public</span> <span class="ty">TMP_Text</span> statusText;
+    <span class="kw">public</span> <span class="ty">GameObject</span> scanningPanel;
+
+    <span class="kw">void</span> <span class="fn">Start</span>()
+    {
+        <span class="kw">var</span> observer = FindObjectOfType&lt;<span class="ty">ObserverBehaviour</span>&gt;();
+        observer.OnTargetStatusChanged += <span class="fn">OnStatus</span>;
+        scanningPanel.SetActive(<span class="kw">true</span>);
+    }
+
+    <span class="kw">void</span> <span class="fn">OnStatus</span>(<span class="ty">ObserverBehaviour</span> b, <span class="ty">TargetStatus</span> status)
+    {
+        <span class="kw">bool</span> tracked = status.Status == <span class="ty">Status</span>.TRACKED;
+        statusText.text = tracked ? <span class="st">"Target Found!"</span> : <span class="st">"Scanning..."</span>;
+        statusText.color = tracked ? <span class="ty">Color</span>.green : <span class="ty">Color</span>.white;
+        scanningPanel.SetActive(!tracked);
+    }
+}</code></pre>
+  </div>
+
+  <div class="card">
+    <p><strong>Hierarchy</strong> with UI overlay:</p>
+    <div class="hierarchy">
+      <div class="hierarchy-title">Hierarchy</div>
+      <div class="hierarchy-item"><span class="indent" style="width:0"></span>&#9654; AR Camera</div>
+      <div class="hierarchy-item"><span class="indent" style="width:0"></span>&#127919; ImageTarget</div>
+      <div class="hierarchy-item"><span class="indent" style="width:20px"></span>&#128230; 3D Content</div>
+      <div class="hierarchy-item selected"><span class="indent" style="width:0"></span>&#9634; Canvas [Screen Space - Overlay]</div>
+      <div class="hierarchy-item"><span class="indent" style="width:20px"></span>&#9634; StatusText (TMP)</div>
+      <div class="hierarchy-item"><span class="indent" style="width:20px"></span>&#9634; ScanningPanel</div>
+      <div class="hierarchy-item"><span class="indent" style="width:20px"></span>&#9634; ResetButton</div>
+      <div class="hierarchy-item"><span class="indent" style="width:20px"></span>&#9634; SwitchModelButton</div>
+      <div class="hierarchy-item"><span class="indent" style="width:0"></span>&#9881; EventSystem</div>
+    </div>
+  </div>
+
+  <!-- Interactive UI Demo -->
+  <div class="demo-box">
+    <div class="demo-label">LIVE PREVIEW</div>
+    <div class="webcam-frame" id="demo08" style="max-width:300px;min-height:260px;margin:0 auto;cursor:pointer">
+      <div class="webcam-label">WEBCAM FEED</div>
+      <!-- Scanning overlay -->
+      <div id="scanPanel08" style="position:absolute;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:10;transition:opacity 0.3s">
+        <div style="text-align:center">
+          <div style="font-size:28px;margin-bottom:8px;animation:bobFloat 2s ease-in-out infinite">&#128270;</div>
+          <div style="font-family:var(--mono);font-size:12px;color:var(--text)">Scanning...</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--dim);margin-top:4px">Point camera at target image</div>
+        </div>
+      </div>
+      <!-- Target + content (hidden initially) -->
+      <div class="target-image" id="target08" style="opacity:0">
+        <div class="target-label">IMAGE<br>TARGET</div>
+      </div>
+      <div id="object08" style="position:absolute;bottom:120px;left:50%;transform:translateX(-50%);width:36px;height:36px;background:var(--accent);border:2px solid rgba(255,255,255,0.3);box-shadow:0 6px 20px rgba(236,72,153,0.5);transition:all 0.3s;opacity:0"></div>
+      <!-- Status text -->
+      <div id="statusText08" style="position:absolute;top:28px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:11px;color:white;letter-spacing:1px;white-space:nowrap;z-index:11">Scanning...</div>
+      <!-- UI Buttons -->
+      <div style="position:absolute;bottom:10px;left:0;right:0;display:flex;justify-content:center;gap:6px;z-index:12;padding:0 8px">
+        <button class="btn" id="uiReset08" style="font-size:9px;padding:4px 8px;background:rgba(0,0,0,0.6);border-color:var(--accent)">Reset</button>
+        <button class="btn" id="uiSwitch08" style="font-size:9px;padding:4px 8px;background:rgba(0,0,0,0.6);border-color:var(--accent3);color:var(--accent3)">Switch</button>
+      </div>
+    </div>
+    <div class="ctrl" style="max-width:300px;margin:8px auto 0">
+      <button class="btn" id="toggleScan08">Toggle Found / Scanning</button>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<!-- ══ BONUS ══ -->
+<div class="part-div"><div class="part-inner" style="background:linear-gradient(135deg,rgba(52,211,153,0.06),transparent)">
+  <div class="part-label" style="color:var(--accent4)">Bonus</div>
+  <div class="part-title">Advanced</div>
+  <p class="part-desc">Ground plane detection and building to a real phone.</p>
+</div></div>
+
+<div class="wrap">
+
+<!-- ── 09 ── -->
+<section class="lesson" id="s9">
+  <div class="lesson-head"><span class="lesson-num" style="color:var(--accent4);background:rgba(52,211,153,0.12);border-color:rgba(52,211,153,0.25)">09</span><h2 class="lesson-title">Ground Plane (Bonus)</h2></div>
+  <div class="card">
+    <p>Vuforia also supports <strong>plane detection</strong> (similar to AR Foundation). This lets users tap the ground to place objects without needing a printed image.</p>
+    <p style="margin-top:8px"><strong>Setup:</strong></p>
+    <ol style="margin-left:1.5rem;color:#c5cad8;line-height:1.85;font-size:15px;margin-top:8px">
+      <li>GameObject &rarr; <strong>Vuforia Engine</strong> &rarr; <strong>Ground Plane</strong> &rarr; <strong>Plane Finder</strong></li>
+      <li>GameObject &rarr; <strong>Vuforia Engine</strong> &rarr; <strong>Ground Plane</strong> &rarr; <strong>Ground Plane Stage</strong></li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <div class="inspector">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> Plane Finder</div>
+      <div class="inspector-row"><div class="inspector-label">Content Positioning</div><div class="inspector-val"><span class="highlight">Content Positioning Behaviour</span></div></div>
+      <div class="inspector-row"><div class="inspector-label">Anchor Stage</div><div class="inspector-val"><span class="highlight">Ground Plane Stage</span></div></div>
+    </div>
+    <div class="inspector" style="margin-top:8px">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> Ground Plane Stage</div>
+      <div class="inspector-row"><div class="inspector-label">Children</div><div class="inspector-val">Your 3D content goes here</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="code-head">
+      <span class="code-label">C# &mdash; GroundPlacer.cs</span>
+      <div><button class="cbtn" onclick="copyEl('code-09')">Copy</button></div>
+    </div>
+    <pre><code id="code-09"><span class="kw">using</span> UnityEngine;
+<span class="kw">using</span> Vuforia;
+
+<span class="kw">public class</span> <span class="ty">GroundPlacer</span> : <span class="ty">MonoBehaviour</span>
+{
+    <span class="kw">public</span> <span class="ty">GameObject</span> prefab;
+    <span class="kw">public</span> <span class="ty">PlaneFinderBehaviour</span> planeFinder;
+    <span class="ty">GameObject</span> placed;
+
+    <span class="kw">public void</span> <span class="fn">OnContentPlaced</span>()
+    {
+        <span class="kw">if</span> (placed != <span class="kw">null</span>) Destroy(placed);
+        placed = Instantiate(prefab,
+            planeFinder.PlaneIndicator.transform.position,
+            planeFinder.PlaneIndicator.transform.rotation);
+    }
+}</code></pre>
+    <div class="unity-note"><strong>Ground Plane detection works best on textured surfaces</strong> &mdash; plain floors may not detect well. Carpet, wood grain, and tile patterns work best.</div>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- ── 10 ── -->
+<section class="lesson" id="s10">
+  <div class="lesson-head"><span class="lesson-num" style="color:var(--accent4);background:rgba(52,211,153,0.12);border-color:rgba(52,211,153,0.25)">10</span><h2 class="lesson-title">Build &amp; Deploy</h2></div>
+  <div class="card">
+    <p>Vuforia apps can be built to <strong>Android</strong> and <strong>iOS</strong> just like AR Foundation. The key difference: <strong>Vuforia also works in the Editor</strong>, so test there first!</p>
+  </div>
+
+  <div class="card">
+    <p><strong>Android build:</strong></p>
+    <div class="two">
+      <div>
+        <p><strong>1.</strong> File &rarr; Build Settings &rarr; <strong>Android</strong><br>
+        <strong>2.</strong> Player Settings &rarr; Min API Level: <strong>API 24</strong><br>
+        <strong>3.</strong> Scripting Backend: <strong>IL2CPP</strong><br>
+        <strong>4.</strong> Target Architectures: <strong>ARM64</strong></p>
+      </div>
+      <div>
+        <p><strong>5.</strong> Connect phone via USB<br>
+        <strong>6.</strong> Enable <strong>Developer Mode</strong> + <strong>USB Debugging</strong><br>
+        <strong>7.</strong> <strong>Build And Run</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p><strong>iOS build:</strong> Same process as AR Foundation &mdash; builds an Xcode project, sign with Apple Developer account, deploy to device.</p>
+  </div>
+
+  <div class="card">
+    <p><strong>Troubleshooting:</strong></p>
+    <table class="compare-table">
+      <thead><tr><th>Problem</th><th>Cause</th><th>Fix</th></tr></thead>
+      <tbody>
+        <tr><td>No webcam</td><td>Permissions</td><td>Check camera access in OS settings</td></tr>
+        <tr><td>Target not tracking</td><td>Poor image</td><td>Use higher-rated target (4-5 stars)</td></tr>
+        <tr><td>Jittery content</td><td>Small printout</td><td>Print larger (A4 minimum)</td></tr>
+        <tr><td>License error</td><td>Wrong key</td><td>Re-copy from developer portal</td></tr>
+        <tr><td>Black screen on phone</td><td>Missing permission</td><td>Add camera permission to Player Settings</td></tr>
+        <tr><td>Content wrong size</td><td>Width mismatch</td><td>Match Width to real print size in metres</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+</div>
+
+<!-- ══ CHECKLIST ══ -->
+<div class="checklist" id="checklist">
+  <div class="checklist-card">
+    <h2>Your Vuforia AR Checklist</h2>
+    <div class="checklist-item" data-check="0"><input type="checkbox"> Created Vuforia developer account</div>
+    <div class="checklist-item" data-check="1"><input type="checkbox"> Generated license key</div>
+    <div class="checklist-item" data-check="2"><input type="checkbox"> Created and uploaded target database</div>
+    <div class="checklist-item" data-check="3"><input type="checkbox"> Installed Vuforia Engine in Unity</div>
+    <div class="checklist-item" data-check="4"><input type="checkbox"> Set up AR Camera with license key</div>
+    <div class="checklist-item" data-check="5"><input type="checkbox"> Created Image Target from database</div>
+    <div class="checklist-item" data-check="6"><input type="checkbox"> Placed 3D content on target</div>
+    <div class="checklist-item" data-check="7"><input type="checkbox"> Tested with webcam in Editor</div>
+    <div class="checklist-item" data-check="8"><input type="checkbox"> Added multiple targets</div>
+    <div class="checklist-item" data-check="9"><input type="checkbox"> Added animations on target found</div>
+    <div class="checklist-item" data-check="10"><input type="checkbox"> Created UI overlay with status</div>
+    <div class="checklist-item" data-check="11"><input type="checkbox"> Explored Ground Plane detection</div>
+  </div>
+</div>
+
+<footer>Immersive Environments &middot; Week 9 &middot; Vuforia Journey</footer>
+
+<!-- ═══════════ JAVASCRIPT ═══════════ -->
+<script>
+(function(){
+
+/* ── Copy Button ── */
+window.copyEl = function(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  var text = el.textContent || el.innerText;
+  navigator.clipboard.writeText(text).then(function() {
+    var btns = document.querySelectorAll('.cbtn');
+    btns.forEach(function(b) {
+      if (b.getAttribute('onclick') && b.getAttribute('onclick').indexOf(id) !== -1) {
+        b.classList.add('ok');
+        b.textContent = 'Copied!';
+        setTimeout(function(){ b.classList.remove('ok'); b.textContent = 'Copy'; }, 1500);
+      }
+    });
+  });
+};
+
+/* ── 00: What is Vuforia Demo ── */
+var target00 = document.getElementById('target00');
+var object00 = document.getElementById('object00');
+var status00 = document.getElementById('status00');
+var state00 = document.getElementById('state00');
+var tracked00 = true;
+
+document.getElementById('toggleTracked00').addEventListener('click', function() {
+  tracked00 = !tracked00;
+  target00.style.opacity = tracked00 ? '1' : '0.15';
+  target00.style.borderColor = tracked00 ? 'rgba(236,72,153,0.5)' : 'rgba(255,60,60,0.3)';
+  object00.style.opacity = tracked00 ? '1' : '0.1';
+  object00.style.transform = tracked00 ? 'translateX(-50%) scale(1)' : 'translateX(-50%) scale(0.3)';
+  status00.innerHTML = tracked00 ? '&#10003; TARGET TRACKED' : '&#10007; TARGET LOST';
+  status00.style.color = tracked00 ? 'var(--accent4)' : '#ff6b6b';
+  state00.textContent = 'Status: ' + (tracked00 ? 'Tracked' : 'Lost');
+});
+
+/* ── 04: Image Targets Demo ── */
+var targetName04 = document.getElementById('targetName04');
+var stars04 = document.getElementById('stars04');
+var state04 = document.getElementById('state04');
+var tgtBtns04 = [document.getElementById('tgtA04'), document.getElementById('tgtB04'), document.getElementById('tgtC04')];
+var targetData04 = [
+  { name: 'Target A', stars: 4 },
+  { name: 'Target B', stars: 5 },
+  { name: 'Target C', stars: 2 }
+];
+
+function setTarget04(idx) {
+  tgtBtns04.forEach(function(b) { b.classList.remove('active'); });
+  tgtBtns04[idx].classList.add('active');
+  var d = targetData04[idx];
+  targetName04.textContent = d.name;
+  var starHtml = '';
+  for (var i = 0; i < 5; i++) {
+    starHtml += '<span class="star ' + (i < d.stars ? 'filled' : '') + '">&#9733;</span>';
+  }
+  stars04.innerHTML = starHtml;
+  state04.textContent = d.name + ' \u00b7 Rating: ' + d.stars + '/5';
+  var plane = document.getElementById('targetPlane04');
+  var colors = ['rgba(236,72,153,', 'rgba(34,211,238,', 'rgba(249,115,22,'];
+  plane.style.borderColor = colors[idx] + '0.4)';
+  plane.style.background = 'repeating-conic-gradient(' + colors[idx] + '0.06) 0% 25%, transparent 0% 50%) 0 0/16px 16px';
+  targetName04.style.color = colors[idx] + '0.5)';
+}
+
+tgtBtns04[0].addEventListener('click', function() { setTarget04(0); });
+tgtBtns04[1].addEventListener('click', function() { setTarget04(1); });
+tgtBtns04[2].addEventListener('click', function() { setTarget04(2); });
+
+/* ── 05: Place Content Demo ── */
+var objectArea05 = document.getElementById('objectArea05');
+var state05 = document.getElementById('state05');
+var scale05 = document.getElementById('scale05');
+var scaleVal05 = document.getElementById('scaleVal05');
+var objects05 = [];
+var currentScale05 = 28;
+
+function addObject05(type) {
+  var obj = document.createElement('div');
+  obj.style.width = currentScale05 + 'px';
+  obj.style.height = currentScale05 + 'px';
+  obj.style.transition = 'all 0.3s';
+  obj.style.flexShrink = '0';
+  if (type === 'cube') {
+    obj.style.background = 'var(--accent)';
+    obj.style.border = '2px solid rgba(255,255,255,0.3)';
+    obj.style.boxShadow = '0 4px 12px rgba(236,72,153,0.4)';
+  } else if (type === 'sphere') {
+    obj.style.background = 'var(--accent3)';
+    obj.style.border = '2px solid rgba(255,255,255,0.3)';
+    obj.style.borderRadius = '50%';
+    obj.style.boxShadow = '0 4px 12px rgba(34,211,238,0.4)';
+  } else {
+    obj.style.background = 'var(--accent4)';
+    obj.style.border = '2px solid rgba(255,255,255,0.3)';
+    obj.style.borderRadius = '4px 4px 50% 50%';
+    obj.style.boxShadow = '0 4px 12px rgba(52,211,153,0.4)';
+  }
+  obj.style.transform = 'scale(0)';
+  objectArea05.appendChild(obj);
+  objects05.push(obj);
+  setTimeout(function() { obj.style.transform = 'scale(1)'; }, 20);
+  state05.textContent = 'Objects: ' + objects05.length;
+}
+
+document.getElementById('addCube05').addEventListener('click', function() { addObject05('cube'); });
+document.getElementById('addSphere05').addEventListener('click', function() { addObject05('sphere'); });
+document.getElementById('addCylinder05').addEventListener('click', function() { addObject05('cylinder'); });
+
+document.getElementById('clear05').addEventListener('click', function() {
+  objects05.forEach(function(o) { o.remove(); });
+  objects05 = [];
+  state05.textContent = 'Objects: 0';
+});
+
+scale05.addEventListener('input', function() {
+  currentScale05 = parseInt(this.value);
+  scaleVal05.textContent = (currentScale05 / 28).toFixed(1) + 'x';
+  objects05.forEach(function(o) {
+    o.style.width = currentScale05 + 'px';
+    o.style.height = currentScale05 + 'px';
+  });
+});
+
+/* ── 06: Multiple Targets Demo ── */
+var trackedA06 = true;
+var trackedB06 = true;
+var objA06 = document.getElementById('objA06');
+var objB06 = document.getElementById('objB06');
+var targetA06 = document.getElementById('targetA06');
+var targetB06 = document.getElementById('targetB06');
+var statusA06 = document.getElementById('statusA06');
+var statusB06 = document.getElementById('statusB06');
+var state06 = document.getElementById('state06');
+
+function update06() {
+  objA06.style.opacity = trackedA06 ? '1' : '0.1';
+  objA06.style.transform = trackedA06 ? 'translateX(-50%) scale(1)' : 'translateX(-50%) scale(0.3)';
+  targetA06.style.borderColor = trackedA06 ? 'rgba(236,72,153,0.4)' : 'rgba(255,60,60,0.2)';
+  statusA06.innerHTML = trackedA06 ? '<span style="color:var(--accent4)">&#10003; TRACKED</span>' : '<span style="color:#ff6b6b">&#10007; LOST</span>';
+
+  objB06.style.opacity = trackedB06 ? '1' : '0.1';
+  objB06.style.transform = trackedB06 ? 'translateX(-50%) scale(1)' : 'translateX(-50%) scale(0.3)';
+  targetB06.style.borderColor = trackedB06 ? 'rgba(34,211,238,0.4)' : 'rgba(255,60,60,0.2)';
+  statusB06.innerHTML = trackedB06 ? '<span style="color:var(--accent4)">&#10003; TRACKED</span>' : '<span style="color:#ff6b6b">&#10007; LOST</span>';
+
+  state06.textContent = 'A: ' + (trackedA06 ? 'Tracked' : 'Lost') + ' \u00b7 B: ' + (trackedB06 ? 'Tracked' : 'Lost');
+}
+
+document.getElementById('toggleA06').addEventListener('click', function() { trackedA06 = !trackedA06; update06(); });
+document.getElementById('toggleB06').addEventListener('click', function() { trackedB06 = !trackedB06; update06(); });
+
+/* ── 07: Animation Demo ── */
+var animObj07 = document.getElementById('animObj07');
+var state07 = document.getElementById('state07');
+var bobbing07 = false;
+
+document.getElementById('triggerScale07').addEventListener('click', function() {
+  animObj07.style.transition = 'none';
+  animObj07.style.transform = 'scale(0)';
+  animObj07.style.animation = 'none';
+  bobbing07 = false;
+  setTimeout(function() {
+    animObj07.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+    animObj07.style.transform = 'scale(1)';
+    state07.textContent = 'Status: Found (Scale In)';
+  }, 30);
+});
+
+document.getElementById('triggerBob07').addEventListener('click', function() {
+  if (animObj07.style.transform === 'scale(0)') return;
+  bobbing07 = !bobbing07;
+  if (bobbing07) {
+    animObj07.style.transition = 'none';
+    animObj07.style.animation = 'bobFloat 2s ease-in-out infinite';
+    animObj07.style.transform = '';
+    state07.textContent = 'Status: Found (Bobbing)';
+  } else {
+    animObj07.style.animation = 'none';
+    animObj07.style.transform = 'scale(1)';
+    state07.textContent = 'Status: Found (Idle)';
+  }
+});
+
+document.getElementById('resetAnim07').addEventListener('click', function() {
+  animObj07.style.animation = 'none';
+  animObj07.style.transition = 'transform 0.3s ease-in';
+  animObj07.style.transform = 'scale(0)';
+  bobbing07 = false;
+  state07.textContent = 'Status: Lost';
+});
+
+/* ── 08: UI Overlay Demo ── */
+var scanPanel08 = document.getElementById('scanPanel08');
+var target08 = document.getElementById('target08');
+var object08 = document.getElementById('object08');
+var statusText08 = document.getElementById('statusText08');
+var found08 = false;
+var objShapes08 = ['cube', 'sphere', 'cylinder'];
+var shapeIdx08 = 0;
+
+function updateUI08() {
+  scanPanel08.style.opacity = found08 ? '0' : '1';
+  scanPanel08.style.pointerEvents = found08 ? 'none' : 'all';
+  target08.style.opacity = found08 ? '1' : '0';
+  object08.style.opacity = found08 ? '1' : '0';
+  statusText08.textContent = found08 ? 'Target Found!' : 'Scanning...';
+  statusText08.style.color = found08 ? '#4ade80' : 'white';
+}
+
+document.getElementById('toggleScan08').addEventListener('click', function() {
+  found08 = !found08;
+  updateUI08();
+});
+
+document.getElementById('uiReset08').addEventListener('click', function(e) {
+  e.stopPropagation();
+  found08 = false;
+  updateUI08();
+});
+
+document.getElementById('uiSwitch08').addEventListener('click', function(e) {
+  e.stopPropagation();
+  shapeIdx08 = (shapeIdx08 + 1) % objShapes08.length;
+  var s = objShapes08[shapeIdx08];
+  object08.style.borderRadius = s === 'sphere' ? '50%' : s === 'cylinder' ? '4px 4px 50% 50%' : '0';
+  object08.style.background = s === 'sphere' ? 'var(--accent3)' : s === 'cylinder' ? 'var(--accent4)' : 'var(--accent)';
+  var shadow = s === 'sphere' ? 'rgba(34,211,238,0.5)' : s === 'cylinder' ? 'rgba(52,211,153,0.5)' : 'rgba(236,72,153,0.5)';
+  object08.style.boxShadow = '0 6px 20px ' + shadow;
+});
+
+/* ── Checklist ── */
+document.querySelectorAll('.checklist-item').forEach(function(item) {
+  var cb = item.querySelector('input[type="checkbox"]');
+  item.addEventListener('click', function(e) {
+    if (e.target !== cb) cb.checked = !cb.checked;
+    item.classList.toggle('checked', cb.checked);
+  });
+});
+
+/* ── Nav pill active state on scroll ── */
+var sections = document.querySelectorAll('.lesson');
+var navLinks = document.querySelectorAll('.nav a');
+
+function updateNav() {
+  var scrollY = window.scrollY + 120;
+  sections.forEach(function(s) {
+    var top = s.offsetTop;
+    var bottom = top + s.offsetHeight;
+    var id = s.id;
+    navLinks.forEach(function(link) {
+      if (link.getAttribute('href') === '#' + id) {
+        link.classList.toggle('active', scrollY >= top && scrollY < bottom);
+      }
+    });
+  });
+}
+
+var scrollTimer;
+window.addEventListener('scroll', function() {
+  clearTimeout(scrollTimer);
+  scrollTimer = setTimeout(updateNav, 50);
+});
+
+})();
+</script>
+</body>
+</html>

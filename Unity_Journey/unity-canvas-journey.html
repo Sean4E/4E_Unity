@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unity Canvas Journey - Build UI in Unity</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07080f;--surface:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--accent:#22d3ee;--accent2:#a78bfa;--accent3:#f97316;--accent4:#34d399;--text:#e8eaf0;--dim:#7a7f96;--code-bg:rgba(0,0,0,0.5);--mono:'Space Mono',monospace;--display:'Syne',sans-serif}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--display);line-height:1.7}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(34,211,238,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(34,211,238,0.02) 1px,transparent 1px);background-size:60px 60px}
+.hero{position:relative;padding:70px 40px 30px;text-align:center;z-index:1}
+.hero-badge{display:inline-block;background:rgba(34,211,238,0.15);border:1px solid rgba(34,211,238,0.3);color:var(--accent);font-family:var(--mono);font-size:11px;letter-spacing:3px;text-transform:uppercase;padding:6px 18px;border-radius:100px;margin-bottom:24px}
+.hero h1{font-size:clamp(34px,6vw,68px);font-weight:800;line-height:1.05;letter-spacing:-2px;margin-bottom:16px}
+.hero h1 .cyan{color:var(--accent)}
+.hero p{font-size:16px;color:var(--dim);max-width:620px;margin:0 auto 12px;line-height:1.8}
+.hero-sub{font-family:var(--mono);font-size:11px;color:#3f4460;letter-spacing:1px}
+.nav{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:0 40px 40px;z-index:1;position:relative}
+.nav a{background:var(--surface);border:1px solid var(--border);color:var(--dim);font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:100px;text-decoration:none;transition:all 0.2s;letter-spacing:0.5px}
+.nav a:hover,.nav a.active{background:rgba(34,211,238,0.15);border-color:rgba(34,211,238,0.4);color:var(--accent)}
+.nav-div{width:100%;text-align:center;font-family:var(--mono);font-size:10px;color:#2a2d3a;letter-spacing:2px;padding:4px 0}
+.wrap{max-width:1100px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+.lesson{margin-bottom:50px}
+.lesson-head{display:flex;align-items:flex-start;gap:16px;margin-bottom:20px}
+.lesson-num{font-family:var(--mono);font-size:12px;color:var(--accent);background:rgba(34,211,238,0.12);border:1px solid rgba(34,211,238,0.25);padding:4px 10px;border-radius:6px;white-space:nowrap;margin-top:5px}
+.lesson-title{font-size:clamp(20px,3vw,30px);font-weight:800;letter-spacing:-1px;line-height:1.1}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px 26px;margin-bottom:16px;backdrop-filter:blur(8px)}
+.card p{font-size:15px;color:#c5cad8;line-height:1.85}
+.card strong{color:var(--accent);font-weight:700}
+.card .purple{color:var(--accent2)}
+.card .orange{color:var(--accent3)}
+.card .green{color:var(--accent4)}
+.analogy{background:rgba(167,139,250,0.06);border-left:3px solid var(--accent2);padding:12px 18px;border-radius:0 10px 10px 0;margin:12px 0;font-size:14px;color:#b8a5e8;font-style:italic}
+.unity-note{background:rgba(34,211,238,0.06);border-left:3px solid var(--accent);padding:10px 16px;border-radius:0 10px 10px 0;margin:12px 0 0;font-size:13px;color:#7dd8e8;font-style:italic}
+.warn-note{background:rgba(249,115,22,0.06);border-left:3px solid var(--accent3);padding:10px 16px;border-radius:0 10px 10px 0;margin:12px 0 0;font-size:13px;color:#e8a87d;font-style:italic}
+.success-note{background:rgba(52,211,153,0.06);border-left:3px solid var(--accent4);padding:10px 16px;border-radius:0 10px 10px 0;margin:12px 0 0;font-size:13px;color:#7de8b8;font-style:italic}
+.code-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.code-label{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:1px;text-transform:uppercase}
+.cbtn{background:var(--surface);border:1px solid var(--border);color:var(--dim);font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:5px;cursor:pointer;transition:all 0.2s}
+.cbtn:hover{color:var(--accent);border-color:rgba(34,211,238,0.3)}
+.cbtn.ok{border-color:#4ade80;color:#4ade80;background:rgba(74,222,128,0.1)}
+pre{background:var(--code-bg);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:18px 20px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.85;color:var(--text);margin-bottom:16px;white-space:pre}
+code{font-family:inherit}
+.kw{color:#c792ea}.st{color:#c3e88d}.nm{color:#f78c6c}.cm{color:#546e7a;font-style:italic}.ty{color:#22d3ee}.fn{color:#34d399}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.two>div{min-width:0}
+@media(max-width:850px){.two{grid-template-columns:1fr}.hero{padding:50px 20px 20px}.nav{padding:0 16px 24px}.wrap{padding:0 14px}pre{font-size:11px;padding:14px}.element-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))!important}.anchor-grid{max-width:240px!important}}
+.ctrl{margin-top:8px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px}
+.ctrl label{color:var(--dim);font-size:11px;font-family:var(--mono);white-space:nowrap}
+.ctrl input[type="range"]{width:70px;accent-color:var(--accent)}
+.ctrl input[type="color"]{width:26px;height:22px;border:1px solid var(--border);border-radius:4px;padding:0;cursor:pointer;background:none}
+.ctrl .vv{color:var(--dim);font-family:var(--mono);font-size:11px;min-width:28px}
+.ctrl select{background:var(--code-bg);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:3px 6px;font-size:11px;font-family:var(--mono)}
+.btn{padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--dim);font-size:11px;font-family:var(--mono);cursor:pointer;transition:all 0.15s}
+.btn:hover{border-color:var(--accent);color:var(--text)}
+.btn.primary{background:var(--accent);color:#07080f;border-color:var(--accent);font-weight:700}
+.shape-btn{padding:4px 8px;border-radius:5px;border:1px solid var(--border);background:var(--surface);color:var(--dim);font-size:10px;font-family:var(--mono);cursor:pointer;transition:all 0.15s}
+.shape-btn:hover,.shape-btn.active{border-color:var(--accent);color:var(--text);background:rgba(34,211,238,0.12)}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:40px 0}
+.part-div{max-width:1100px;margin:30px auto 20px;padding:0 24px}
+.part-inner{border:1px solid var(--border);border-radius:12px;padding:20px 24px;text-align:center;background:linear-gradient(135deg,rgba(34,211,238,0.06),transparent)}
+.part-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:3px;color:var(--accent);margin-bottom:4px}
+.part-title{font-size:22px;font-weight:800;margin-bottom:4px}
+.part-desc{color:var(--dim);font-size:14px}
+footer{text-align:center;padding:36px 24px;color:var(--dim);font-family:var(--mono);font-size:11px;border-top:1px solid var(--border);margin-top:50px;position:relative;z-index:1}
+
+/* ── Demo Boxes ── */
+.demo-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:16px;position:relative;overflow:hidden}
+.demo-label{position:absolute;top:8px;right:10px;font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;z-index:2}
+.mock-viewport{background:#3c3c3c;border-radius:8px;min-height:200px;display:flex;align-items:center;justify-content:center;position:relative;border:1px solid #555}
+.mock-viewport-label{position:absolute;top:6px;left:10px;font-size:9px;color:rgba(255,255,255,0.25);font-family:var(--mono)}
+.state-indicator{font-family:var(--mono);font-size:11px;color:var(--accent);margin-top:8px;text-align:center}
+
+/* ── Element Cards ── */
+.element-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin:14px 0}
+.element-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:all 0.2s;text-align:center;user-select:none}
+.element-card:hover{border-color:var(--accent);transform:translateY(-2px);background:rgba(34,211,238,0.04)}
+.element-card.active{border-color:var(--accent);background:rgba(34,211,238,0.08)}
+.element-card .el-icon{font-size:24px;margin-bottom:6px}
+.element-card .el-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;font-family:var(--mono)}
+.element-card .el-html{font-size:10px;color:var(--dim);font-family:var(--mono)}
+.el-info{background:rgba(34,211,238,0.06);border:1px solid rgba(34,211,238,0.15);border-radius:12px;padding:16px 20px;margin-top:12px;font-size:14px;color:#a5d8e8;display:none}
+.el-info.show{display:block}
+
+/* ── Inspector Mockup ── */
+.inspector{background:#1e2129;border:1px solid #3a3f52;border-radius:8px;overflow:hidden;font-family:var(--display);margin:12px 0}
+.inspector-header{background:#282c36;padding:7px 12px;font-size:11px;font-weight:700;color:#e8eaf0;display:flex;align-items:center;gap:6px;border-bottom:1px solid #3a3f52}
+.inspector-header .arrow{color:var(--accent);font-size:10px}
+.inspector-row{display:flex;align-items:center;padding:4px 12px;border-bottom:1px solid rgba(255,255,255,0.03);font-size:11px}
+.inspector-label{color:#8890aa;width:120px;flex-shrink:0;font-family:var(--mono);font-size:10px}
+.inspector-val{color:#c9d1e0;flex:1;font-family:var(--mono);font-size:11px}
+.inspector-val .fake-input{background:#282c36;border:1px solid #3a3f52;border-radius:3px;color:#c9d1e0;padding:2px 8px;font-size:10px;font-family:var(--mono);width:60px}
+.inspector-val .highlight{color:var(--accent);font-weight:700}
+
+/* ── Hierarchy Mockup ── */
+.hierarchy{background:#1e2129;border:1px solid #3a3f52;border-radius:8px;overflow:hidden;margin:12px 0}
+.hierarchy-title{background:#282c36;padding:7px 12px;font-size:11px;font-weight:700;color:#e8eaf0;border-bottom:1px solid #3a3f52;display:flex;align-items:center;gap:6px}
+.hierarchy-item{display:flex;align-items:center;gap:6px;padding:3px 8px;font-size:11px;color:#a0a8c0;font-family:var(--mono)}
+.hierarchy-item.selected{background:rgba(34,211,238,0.1);color:var(--accent)}
+.hierarchy-item .indent{display:inline-block}
+
+/* ── Comparison Table ── */
+.compare-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px}
+.compare-table th{background:rgba(34,211,238,0.1);color:var(--accent);font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:8px 12px;text-align:left;border-bottom:2px solid rgba(34,211,238,0.2)}
+.compare-table td{padding:6px 12px;border-bottom:1px solid var(--border);color:#c5cad8;font-family:var(--mono);font-size:11px}
+.compare-table tr:hover td{background:rgba(255,255,255,0.02)}
+
+/* ── Anchor Grid ── */
+.anchor-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:280px;margin:0 auto}
+.anchor-cell{aspect-ratio:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;transition:all 0.18s;padding:8px;font-family:var(--mono);font-size:9px;color:var(--dim);text-align:center;user-select:none}
+.anchor-cell:hover{border-color:var(--accent);background:rgba(34,211,238,0.06)}
+.anchor-cell.active{border-color:var(--accent);background:rgba(34,211,238,0.12);color:var(--accent)}
+.anchor-preview{width:100%;aspect-ratio:16/9;background:#2a2a3e;border:1px solid var(--border);border-radius:8px;position:relative;margin-top:12px;overflow:hidden}
+.anchor-dot{width:40px;height:24px;background:var(--accent);border-radius:4px;position:absolute;transition:all 0.3s ease;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:8px;color:#07080f;font-weight:700}
+.anchor-desc{margin-top:8px;font-size:12px;color:var(--dim);font-family:var(--mono);text-align:center;min-height:30px}
+
+/* ── Checklist ── */
+.checklist{max-width:1100px;margin:30px auto;padding:0 24px}
+.checklist-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px 28px}
+.checklist-card h2{font-size:20px;font-weight:800;margin-bottom:14px;color:var(--accent)}
+.checklist-item{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:14px;color:#c5cad8;cursor:pointer;user-select:none}
+.checklist-item input[type="checkbox"]{accent-color:var(--accent);width:16px;height:16px;cursor:pointer}
+.checklist-item.checked{color:var(--dim);text-decoration:line-through}
+
+/* ── Layout Demo ── */
+.layout-container{background:#2a2a3e;border-radius:8px;padding:12px;min-height:160px;display:flex;flex-direction:column;gap:8px;transition:all 0.3s}
+.layout-container.horizontal{flex-direction:row;flex-wrap:wrap}
+.layout-container.grid-mode{display:grid;grid-template-columns:1fr 1fr}
+.layout-box{border-radius:6px;padding:10px;font-family:var(--mono);font-size:11px;color:#fff;text-align:center;font-weight:700;min-width:50px;min-height:40px;display:flex;align-items:center;justify-content:center;transition:all 0.3s}
+
+/* ── Scroll Demo ── */
+.scroll-demo{max-height:200px;overflow-y:auto;background:#1e2129;border:1px solid #3a3f52;border-radius:8px;padding:4px}
+.scroll-demo::-webkit-scrollbar{width:8px}
+.scroll-demo::-webkit-scrollbar-track{background:#1e2129;border-radius:0 8px 8px 0}
+.scroll-demo::-webkit-scrollbar-thumb{background:#3a3f52;border-radius:4px}
+.scroll-demo::-webkit-scrollbar-thumb:hover{background:#4a5068}
+.scroll-item{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12px;color:#a0a8c0;font-family:var(--mono);transition:background 0.15s}
+.scroll-item:hover{background:rgba(34,211,238,0.06);color:var(--text)}
+.scroll-item:last-child{border-bottom:none}
+
+/* ── Health Bar ── */
+.health-bar-wrap{width:100%;max-width:300px;margin:0 auto}
+.health-bar-bg{background:#1e2129;border:2px solid #3a3f52;border-radius:6px;height:28px;overflow:hidden;position:relative}
+.health-bar-fill{height:100%;transition:width 0.3s,background 0.3s;border-radius:4px}
+.health-text{text-align:center;font-family:var(--mono);font-size:14px;margin-top:6px;font-weight:700}
+
+/* ── Pause Menu Demo ── */
+.pause-viewport{background:#3c3c3c;border-radius:8px;min-height:240px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;border:1px solid #555}
+.pause-game-content{text-align:center;color:rgba(255,255,255,0.4);font-family:var(--mono);font-size:12px}
+.pause-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.75);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;opacity:0;pointer-events:none;transition:opacity 0.3s;backdrop-filter:blur(4px)}
+.pause-overlay.show{opacity:1;pointer-events:auto}
+.pause-title{font-size:28px;font-weight:800;color:#fff;letter-spacing:2px;font-family:var(--display)}
+.pause-btn{padding:8px 28px;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:#fff;font-size:13px;font-family:var(--mono);cursor:pointer;transition:all 0.15s;min-width:140px}
+.pause-btn:hover{background:rgba(34,211,238,0.2);border-color:var(--accent);color:var(--accent)}
+
+/* ── Toggle Demo ── */
+.toggle-wrap{display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+.toggle-track{width:44px;height:24px;background:#3a3f52;border-radius:12px;position:relative;transition:background 0.2s}
+.toggle-track.on{background:var(--accent)}
+.toggle-thumb{width:20px;height:20px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;transition:left 0.2s}
+.toggle-track.on .toggle-thumb{left:22px}
+.toggle-label{font-family:var(--mono);font-size:12px;color:var(--dim)}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-badge">Build-Along Guide</div>
+  <h1>Unity <span class="cyan">Canvas</span> Journey</h1>
+  <p>Build user interfaces in Unity &mdash; buttons, sliders, panels, and more. Same ideas as HTML/CSS, now in a game engine.</p>
+  <div class="hero-sub">Part 1: Canvas Basics &middot; Part 2: Build It &middot; Bonus: Polish</div>
+</div>
+
+<div class="nav">
+  <div class="nav-div">-- Part 1: Canvas Basics --</div>
+  <a href="#s0">00 Concepts</a>
+  <a href="#s1">01 Canvas</a>
+  <a href="#s2">02 Text</a>
+  <a href="#s3">03 Buttons</a>
+  <a href="#s4">04 Images</a>
+  <a href="#s5">05 Layouts</a>
+  <div class="nav-div">-- Part 2: Build It --</div>
+  <a href="#s6">06 Sliders</a>
+  <a href="#s7">07 Scroll Views</a>
+  <a href="#s8">08 Health Bar</a>
+  <a href="#s9">09 Pause Menu</a>
+  <div class="nav-div">-- Bonus --</div>
+  <a href="#s10">10 Anchoring</a>
+  <a href="#checklist">Checklist</a>
+</div>
+
+<!-- ══ PART 1 ══ -->
+<div class="part-div"><div class="part-inner">
+  <div class="part-label">Part 1 of 2</div>
+  <div class="part-title">Canvas Basics</div>
+  <p class="part-desc">Six steps. Learn what Unity UI elements are and how to add them.</p>
+</div></div>
+
+<div class="wrap">
+
+<!-- ── 00 ── -->
+<section class="lesson" id="s0">
+  <div class="lesson-head"><span class="lesson-num">00</span><h2 class="lesson-title">HTML &rarr; Unity UI</h2></div>
+  <div class="card">
+    <p>If you know HTML, you already know the <strong>concepts</strong> behind Unity UI. The names change, but the ideas are the same.</p>
+    <div class="analogy">Canvas is like an HTML page floating on top of your game. Panels are divs. Buttons are buttons. TextMeshPro is a &lt;p&gt; tag. Layout Groups are CSS Flexbox.</div>
+  </div>
+
+  <div class="card">
+    <p>Here's the full mapping &mdash; <strong>13 concepts</strong> you already know:</p>
+    <table class="compare-table">
+      <thead><tr><th>HTML / CSS</th><th>Unity UI</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>&lt;div&gt;</td><td>Panel (Image)</td><td>Container / background</td></tr>
+        <tr><td>&lt;button&gt;</td><td>Button</td><td>Clickable, has states</td></tr>
+        <tr><td>&lt;p&gt; / &lt;h1&gt;</td><td>TextMeshPro</td><td>Rich text, fonts, colour</td></tr>
+        <tr><td>&lt;img&gt;</td><td>Image</td><td>Displays a sprite</td></tr>
+        <tr><td>&lt;input type="range"&gt;</td><td>Slider</td><td>Drag to pick a number</td></tr>
+        <tr><td>&lt;input type="checkbox"&gt;</td><td>Toggle</td><td>On / off switch</td></tr>
+        <tr><td>&lt;select&gt;</td><td>Dropdown</td><td>Pick from a list</td></tr>
+        <tr><td>&lt;input type="text"&gt;</td><td>InputField</td><td>Type text in</td></tr>
+        <tr><td>overflow: scroll</td><td>Scroll View</td><td>Scrollable container</td></tr>
+        <tr><td>display: flex</td><td>Layout Group</td><td>Auto-arrange children</td></tr>
+        <tr><td>position / top / left</td><td>RectTransform</td><td>Position + anchors</td></tr>
+        <tr><td>addEventListener</td><td>OnClick / UnityEvent</td><td>Wire up interactions</td></tr>
+        <tr><td>&lt;body&gt;</td><td>Canvas</td><td>Root of all UI</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <p><strong>Click a UI element</strong> below to see what it does:</p>
+    <div class="element-grid" id="elGrid">
+      <div class="element-card" data-el="panel"><div class="el-icon">&#9645;</div><div class="el-name">Panel</div><div class="el-html">&lt;div&gt;</div></div>
+      <div class="element-card" data-el="button"><div class="el-icon">&#9634;</div><div class="el-name">Button</div><div class="el-html">&lt;button&gt;</div></div>
+      <div class="element-card" data-el="text"><div class="el-icon">T</div><div class="el-name">Text (TMP)</div><div class="el-html">&lt;p&gt;</div></div>
+      <div class="element-card" data-el="image"><div class="el-icon">&#9635;</div><div class="el-name">Image</div><div class="el-html">&lt;img&gt;</div></div>
+      <div class="element-card" data-el="slider"><div class="el-icon">&#9472;</div><div class="el-name">Slider</div><div class="el-html">&lt;input range&gt;</div></div>
+      <div class="element-card" data-el="toggle"><div class="el-icon">&#9745;</div><div class="el-name">Toggle</div><div class="el-html">&lt;checkbox&gt;</div></div>
+      <div class="element-card" data-el="dropdown"><div class="el-icon">&#9660;</div><div class="el-name">Dropdown</div><div class="el-html">&lt;select&gt;</div></div>
+      <div class="element-card" data-el="inputfield"><div class="el-icon">|</div><div class="el-name">Input Field</div><div class="el-html">&lt;input text&gt;</div></div>
+      <div class="element-card" data-el="scrollview"><div class="el-icon">&#8597;</div><div class="el-name">Scroll View</div><div class="el-html">overflow:scroll</div></div>
+    </div>
+    <div class="el-info" id="elInfo"></div>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- ── 01 ── -->
+<section class="lesson" id="s1">
+  <div class="lesson-head"><span class="lesson-num">01</span><h2 class="lesson-title">Create a Canvas</h2></div>
+  <div class="card">
+    <p>Every UI element in Unity <strong>must</strong> be a child of a Canvas. No Canvas = no UI on screen.</p>
+    <div class="analogy">The Canvas is the browser window. Without it, your HTML elements have nowhere to render.</div>
+    <div class="unity-note"><strong>How to add:</strong> Right-click Hierarchy &rarr; UI &rarr; Canvas. Unity auto-creates an EventSystem too &mdash; don't delete it!</div>
+  </div>
+
+  <div class="card">
+    <p><strong>Hierarchy</strong> after creating a Canvas:</p>
+    <div class="hierarchy">
+      <div class="hierarchy-title">Hierarchy</div>
+      <div class="hierarchy-item"><span class="indent" style="width:0"></span>&#128247; Main Camera</div>
+      <div class="hierarchy-item"><span class="indent" style="width:0"></span>&#128161; Directional Light</div>
+      <div class="hierarchy-item selected"><span class="indent" style="width:0"></span>&#9634; Canvas</div>
+      <div class="hierarchy-item"><span class="indent" style="width:0"></span>&#9881; EventSystem</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p><strong>Inspector</strong> &mdash; Canvas component settings:</p>
+    <div class="inspector">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> Canvas</div>
+      <div class="inspector-row"><div class="inspector-label">Render Mode</div><div class="inspector-val"><span class="highlight">Screen Space - Overlay</span></div></div>
+      <div class="inspector-row"><div class="inspector-label">Sort Order</div><div class="inspector-val">0</div></div>
+    </div>
+    <div class="inspector">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> Canvas Scaler</div>
+      <div class="inspector-row"><div class="inspector-label">UI Scale Mode</div><div class="inspector-val"><span class="highlight">Scale With Screen Size</span></div></div>
+      <div class="inspector-row"><div class="inspector-label">Reference Res.</div><div class="inspector-val"><input class="fake-input" value="1920" readonly> x <input class="fake-input" value="1080" readonly></div></div>
+      <div class="inspector-row"><div class="inspector-label">Match</div><div class="inspector-val">0.5 (Width/Height)</div></div>
+    </div>
+    <div class="warn-note"><strong>Always set Canvas Scaler to "Scale With Screen Size"</strong> with 1920 x 1080. Otherwise your UI will look wrong on different screens.</div>
+  </div>
+
+  <div class="card">
+    <p><strong>Three render modes:</strong></p>
+    <div class="two">
+      <div>
+        <p><strong>Screen Space &mdash; Overlay</strong> (most common)<br><span style="color:var(--dim)">UI drawn on top of everything. No camera needed. Use for HUDs, menus, scores.</span></p>
+        <p style="margin-top:8px"><strong>Screen Space &mdash; Camera</strong><br><span style="color:var(--dim)">UI tied to a camera. Allows post-processing on UI.</span></p>
+      </div>
+      <div>
+        <p><strong>World Space</strong><br><span style="color:var(--dim)">Canvas as a 3D object in the scene. Use for in-game displays, VR/AR interfaces, floating nametags.</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- ── 02 ── -->
+<section class="lesson" id="s2">
+  <div class="lesson-head"><span class="lesson-num">02</span><h2 class="lesson-title">Text &amp; Labels</h2></div>
+  <div class="card">
+    <p>Use <strong>TextMeshPro (TMP)</strong> for all text. Unity's old Text component is blurry &mdash; TMP is sharp at any size.</p>
+    <div class="unity-note"><strong>First time?</strong> Unity will ask you to "Import TMP Essentials" &mdash; click yes. This loads fonts and shaders.</div>
+    <div class="analogy">TextMeshPro is like using a web font with anti-aliasing &mdash; crisp at every size, supports rich text markup like &lt;b&gt;, &lt;color&gt;, &lt;size&gt;.</div>
+  </div>
+
+  <div class="card">
+    <p><strong>Add text:</strong> Right-click Canvas in Hierarchy &rarr; UI &rarr; Text - TextMeshPro</p>
+    <div class="hierarchy">
+      <div class="hierarchy-title">Hierarchy</div>
+      <div class="hierarchy-item"><span class="indent" style="width:0"></span>&#9634; Canvas</div>
+      <div class="hierarchy-item selected"><span class="indent" style="width:16px"></span>&#128196; Title Text (TMP)</div>
+      <div class="hierarchy-item"><span class="indent" style="width:0"></span>&#9881; EventSystem</div>
+    </div>
+    <div class="inspector">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> TextMeshPro - Text (UI)</div>
+      <div class="inspector-row"><div class="inspector-label">Text Input</div><div class="inspector-val">"My Game Title"</div></div>
+      <div class="inspector-row"><div class="inspector-label">Font Size</div><div class="inspector-val"><span class="highlight">36</span></div></div>
+      <div class="inspector-row"><div class="inspector-label">Font Color</div><div class="inspector-val">&#9632; White</div></div>
+      <div class="inspector-row"><div class="inspector-label">Alignment</div><div class="inspector-val">Center / Middle</div></div>
+      <div class="inspector-row"><div class="inspector-label">Wrapping</div><div class="inspector-val">Enabled</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p><strong>Access TMP from a C# script:</strong></p>
+    <div class="code-head">
+      <span class="code-label">C# &mdash; Change text at runtime</span>
+      <div><button class="cbtn" onclick="copyEl('code-02')">Copy</button></div>
+    </div>
+    <pre><code id="code-02"><span class="kw">using</span> TMPro;
+<span class="kw">using</span> UnityEngine;
+
+<span class="kw">public class</span> <span class="ty">ScoreDisplay</span> : <span class="ty">MonoBehaviour</span>
+{
+    [<span class="ty">SerializeField</span>] <span class="ty">TMP_Text</span> scoreText;
+    <span class="kw">int</span> score = <span class="nm">0</span>;
+
+    <span class="kw">public void</span> <span class="fn">AddPoint</span>()
+    {
+        score++;
+        scoreText.text = <span class="st">"Score: "</span> + score;
+    }
+}</code></pre>
+    <div class="unity-note"><strong>TMP_Text</strong> works for both UI text and world-space 3D text.</div>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- ── 03 ── -->
+<section class="lesson" id="s3">
+  <div class="lesson-head"><span class="lesson-num">03</span><h2 class="lesson-title">Buttons</h2></div>
+  <div class="card">
+    <p>A <strong>Button</strong> in Unity = a clickable area with four visual states: <strong>Normal</strong>, <strong class="purple">Highlighted</strong> (hover), <strong class="orange">Pressed</strong>, and <strong style="color:var(--dim)">Disabled</strong>.</p>
+    <div class="analogy">Just like CSS :hover, :active, and :disabled pseudo-classes &mdash; Unity calls them "Transition" states.</div>
+  </div>
+
+  <div class="card">
+    <p><strong>Button hierarchy:</strong> A Button has a child Text object for the label.</p>
+    <div class="hierarchy">
+      <div class="hierarchy-title">Hierarchy</div>
+      <div class="hierarchy-item"><span class="indent" style="width:0"></span>&#9634; Canvas</div>
+      <div class="hierarchy-item selected"><span class="indent" style="width:16px"></span>&#9634; StartButton</div>
+      <div class="hierarchy-item"><span class="indent" style="width:32px"></span>&#128196; Text (TMP)</div>
+    </div>
+    <div class="inspector">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> Button</div>
+      <div class="inspector-row"><div class="inspector-label">Transition</div><div class="inspector-val"><span class="highlight">Color Tint</span></div></div>
+      <div class="inspector-row"><div class="inspector-label">Normal Color</div><div class="inspector-val">&#9632; #4D7BDE</div></div>
+      <div class="inspector-row"><div class="inspector-label">Highlighted</div><div class="inspector-val">&#9632; #6B93EF</div></div>
+      <div class="inspector-row"><div class="inspector-label">Pressed</div><div class="inspector-val">&#9632; #2A5BB5</div></div>
+      <div class="inspector-row"><div class="inspector-label">Disabled</div><div class="inspector-val">&#9632; #555555</div></div>
+    </div>
+  </div>
+
+  <!-- Interactive Button States Demo -->
+  <div class="demo-box">
+    <div class="demo-label">LIVE PREVIEW</div>
+    <div class="mock-viewport" id="btnViewport">
+      <div class="mock-viewport-label">Game View</div>
+      <button id="demoBtn" style="padding:12px 32px;border:none;border-radius:4px;font-size:16px;font-weight:700;color:#fff;cursor:pointer;font-family:var(--display);transition:background 0.1s,transform 0.1s;background:#4d7bde">Start Game</button>
+    </div>
+    <div class="state-indicator">State: <span id="btnState">Normal</span></div>
+    <div class="ctrl">
+      <label>Normal:</label><input type="color" id="btnNormal" value="#4d7bde">
+      <label>Hover:</label><input type="color" id="btnHover" value="#6b93ef">
+      <label>Pressed:</label><input type="color" id="btnPressed" value="#2a5bb5">
+    </div>
+  </div>
+
+  <div class="card">
+    <p><strong>OnClick event</strong> &mdash; like addEventListener('click'). In Unity, you wire it in the Inspector or with code:</p>
+    <div class="code-head">
+      <span class="code-label">C# &mdash; Button click listener</span>
+      <div><button class="cbtn" onclick="copyEl('code-03')">Copy</button></div>
+    </div>
+    <pre><code id="code-03"><span class="kw">using</span> UnityEngine;
+<span class="kw">using</span> UnityEngine.UI;
+
+<span class="kw">public class</span> <span class="ty">MenuController</span> : <span class="ty">MonoBehaviour</span>
+{
+    [<span class="ty">SerializeField</span>] <span class="ty">Button</span> startButton;
+
+    <span class="kw">void</span> <span class="fn">Start</span>()
+    {
+        <span class="cm">// Same as: startButton.addEventListener("click", StartGame)</span>
+        startButton.onClick.AddListener(StartGame);
+    }
+
+    <span class="kw">void</span> <span class="fn">StartGame</span>()
+    {
+        Debug.Log(<span class="st">"Game Started!"</span>);
+    }
+}</code></pre>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- ── 04 ── -->
+<section class="lesson" id="s4">
+  <div class="lesson-head"><span class="lesson-num">04</span><h2 class="lesson-title">Images &amp; Icons</h2></div>
+  <div class="card">
+    <p>The <strong>Image</strong> component displays a Sprite (2D image). Every Panel and Button already has one &mdash; it's the background.</p>
+    <div class="analogy">Like &lt;img src="..."&gt; in HTML, but the image must be imported as a Sprite in Unity first.</div>
+  </div>
+
+  <div class="card">
+    <div class="inspector">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> Image</div>
+      <div class="inspector-row"><div class="inspector-label">Source Image</div><div class="inspector-val"><span class="highlight">heart_icon (Sprite)</span></div></div>
+      <div class="inspector-row"><div class="inspector-label">Color</div><div class="inspector-val">&#9632; White (tint)</div></div>
+      <div class="inspector-row"><div class="inspector-label">Image Type</div><div class="inspector-val"><span class="highlight">Filled</span></div></div>
+      <div class="inspector-row"><div class="inspector-label">Fill Method</div><div class="inspector-val">Horizontal</div></div>
+      <div class="inspector-row"><div class="inspector-label">Fill Amount</div><div class="inspector-val">0.75</div></div>
+    </div>
+    <div class="unity-note"><strong>Image Type: Filled</strong> is how health bars work &mdash; the fill amount goes from 0 to 1. We'll use this in Step 08.</div>
+  </div>
+
+  <div class="card">
+    <p><strong>Import sprites:</strong> Drag an image into your Assets folder. In the Inspector, set Texture Type to <strong>Sprite (2D and UI)</strong>, then click Apply.</p>
+    <p style="margin-top:8px"><strong>Four Image Types:</strong></p>
+    <div class="two">
+      <div>
+        <p><strong>Simple</strong> &mdash; stretches the sprite to fill the rect<br>
+        <strong>Sliced</strong> &mdash; 9-slice scaling (borders stay crisp, center stretches)</p>
+      </div>
+      <div>
+        <p><strong>Tiled</strong> &mdash; repeats the sprite to fill the area<br>
+        <strong>Filled</strong> &mdash; reveals with a fill amount (0 to 1)</p>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- ── 05 ── -->
+<section class="lesson" id="s5">
+  <div class="lesson-head"><span class="lesson-num">05</span><h2 class="lesson-title">Panels &amp; Layouts</h2></div>
+  <div class="card">
+    <p>A <strong>Panel</strong> is just a GameObject with an Image component &mdash; it's your &lt;div&gt;. Add a <strong>Layout Group</strong> to auto-arrange children.</p>
+    <div class="analogy">Layout Groups are CSS Flexbox. Vertical = flex-direction:column. Horizontal = flex-direction:row. Grid = display:grid.</div>
+  </div>
+
+  <!-- Interactive Layout Demo -->
+  <div class="demo-box">
+    <div class="demo-label">LIVE PREVIEW</div>
+    <div class="ctrl" style="margin-bottom:10px;margin-top:0">
+      <button class="shape-btn active" data-layout="vertical" id="layV">Vertical</button>
+      <button class="shape-btn" data-layout="horizontal" id="layH">Horizontal</button>
+      <button class="shape-btn" data-layout="grid" id="layG">Grid</button>
+      <label>Spacing:</label><input type="range" id="laySpacing" min="0" max="20" value="8"><span class="vv" id="laySpacingVal">8px</span>
+      <label>Padding:</label><input type="range" id="layPadding" min="0" max="24" value="12"><span class="vv" id="layPaddingVal">12px</span>
+    </div>
+    <div class="layout-container" id="layoutContainer">
+      <div class="layout-box" style="background:#22d3ee">Box A</div>
+      <div class="layout-box" style="background:#a78bfa">Box B</div>
+      <div class="layout-box" style="background:#f97316">Box C</div>
+      <div class="layout-box" style="background:#34d399">Box D</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="inspector">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> Vertical Layout Group</div>
+      <div class="inspector-row"><div class="inspector-label">Spacing</div><div class="inspector-val">8</div></div>
+      <div class="inspector-row"><div class="inspector-label">Child Alignment</div><div class="inspector-val">Upper Center</div></div>
+      <div class="inspector-row"><div class="inspector-label">Ctrl Child Size</div><div class="inspector-val">Width &#9745;  Height &#9744;</div></div>
+      <div class="inspector-row"><div class="inspector-label">Force Expand</div><div class="inspector-val">Width &#9745;  Height &#9744;</div></div>
+    </div>
+    <div class="unity-note"><strong>Grid Layout Group</strong> is a separate component &mdash; it has Cell Size and Constraint settings instead of Spacing.</div>
+  </div>
+</section>
+
+</div>
+
+<!-- ══ PART 2 ══ -->
+<div class="part-div"><div class="part-inner">
+  <div class="part-label">Part 2 of 2</div>
+  <div class="part-title">Build It</div>
+  <p class="part-desc">Four steps. Build real UI features: sliders, scroll views, a health bar, and a pause menu.</p>
+</div></div>
+
+<div class="wrap">
+
+<!-- ── 06 ── -->
+<section class="lesson" id="s6">
+  <div class="lesson-head"><span class="lesson-num">06</span><h2 class="lesson-title">Sliders &amp; Toggles</h2></div>
+  <div class="card">
+    <p>A <strong>Slider</strong> lets the player pick a number in a range. A <strong>Toggle</strong> is an on/off switch.</p>
+    <div class="analogy">Slider = &lt;input type="range"&gt;. Toggle = &lt;input type="checkbox"&gt;. Same idea, different look.</div>
+    <div class="warn-note"><strong>They're visual only</strong> &mdash; scripts connect them to actual behaviour. A slider does nothing until you wire an OnValueChanged event.</div>
+  </div>
+
+  <div class="card">
+    <p><strong>Slider anatomy:</strong> Background, Fill Area &rarr; Fill, Handle Slide Area &rarr; Handle.</p>
+    <div class="inspector">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> Slider</div>
+      <div class="inspector-row"><div class="inspector-label">Min Value</div><div class="inspector-val">0</div></div>
+      <div class="inspector-row"><div class="inspector-label">Max Value</div><div class="inspector-val">100</div></div>
+      <div class="inspector-row"><div class="inspector-label">Whole Numbers</div><div class="inspector-val">&#9745;</div></div>
+      <div class="inspector-row"><div class="inspector-label">Value</div><div class="inspector-val"><span class="highlight">75</span></div></div>
+      <div class="inspector-row"><div class="inspector-label">On Value Changed</div><div class="inspector-val">(UnityEvent)</div></div>
+    </div>
+  </div>
+
+  <!-- Interactive Slider Demo -->
+  <div class="demo-box">
+    <div class="demo-label">LIVE PREVIEW</div>
+    <div style="max-width:320px;margin:0 auto;padding:16px 0">
+      <div style="font-family:var(--mono);font-size:12px;color:var(--dim);margin-bottom:6px">Volume</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <input type="range" id="demoSlider" min="0" max="100" value="75" style="flex:1;accent-color:var(--accent)">
+        <span id="demoSliderVal" style="font-family:var(--mono);font-size:14px;color:var(--accent);font-weight:700;min-width:36px">75</span>
+      </div>
+      <div style="background:#1e2129;border-radius:4px;height:12px;margin-top:8px;overflow:hidden;border:1px solid #3a3f52">
+        <div id="demoSliderFill" style="height:100%;background:var(--accent);width:75%;transition:width 0.1s;border-radius:3px"></div>
+      </div>
+      <div style="margin-top:20px;display:flex;align-items:center;gap:16px">
+        <div class="toggle-wrap" id="demoToggle">
+          <div class="toggle-track on" id="demoToggleTrack">
+            <div class="toggle-thumb"></div>
+          </div>
+          <span class="toggle-label">Music: <span id="demoToggleVal">ON</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="code-head">
+      <span class="code-label">C# &mdash; Slider + Toggle listeners</span>
+      <div><button class="cbtn" onclick="copyEl('code-06')">Copy</button></div>
+    </div>
+    <pre><code id="code-06"><span class="kw">using</span> UnityEngine;
+<span class="kw">using</span> UnityEngine.UI;
+<span class="kw">using</span> TMPro;
+
+<span class="kw">public class</span> <span class="ty">SettingsUI</span> : <span class="ty">MonoBehaviour</span>
+{
+    [<span class="ty">SerializeField</span>] <span class="ty">Slider</span> volumeSlider;
+    [<span class="ty">SerializeField</span>] <span class="ty">Toggle</span> musicToggle;
+    [<span class="ty">SerializeField</span>] <span class="ty">TMP_Text</span> volumeLabel;
+
+    <span class="kw">void</span> <span class="fn">Start</span>()
+    {
+        volumeSlider.onValueChanged.AddListener(OnVolumeChanged);
+        musicToggle.onValueChanged.AddListener(OnMusicToggled);
+    }
+
+    <span class="kw">void</span> <span class="fn">OnVolumeChanged</span>(<span class="kw">float</span> value)
+    {
+        volumeLabel.text = <span class="st">"Volume: "</span> + Mathf.RoundToInt(value);
+        AudioListener.volume = value / <span class="nm">100f</span>;
+    }
+
+    <span class="kw">void</span> <span class="fn">OnMusicToggled</span>(<span class="kw">bool</span> isOn)
+    {
+        Debug.Log(<span class="st">"Music: "</span> + (isOn ? <span class="st">"ON"</span> : <span class="st">"OFF"</span>));
+    }
+}</code></pre>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- ── 07 ── -->
+<section class="lesson" id="s7">
+  <div class="lesson-head"><span class="lesson-num">07</span><h2 class="lesson-title">Scroll Views</h2></div>
+  <div class="card">
+    <p>A <strong>Scroll View</strong> is a masked area that lets the user scroll through content taller than the visible area.</p>
+    <div class="analogy">Like a &lt;div&gt; with overflow-y: auto and max-height set &mdash; content overflows and you scroll.</div>
+  </div>
+
+  <div class="card">
+    <p><strong>Scroll View hierarchy:</strong></p>
+    <div class="hierarchy">
+      <div class="hierarchy-title">Hierarchy</div>
+      <div class="hierarchy-item selected"><span class="indent" style="width:0"></span>&#9634; Scroll View</div>
+      <div class="hierarchy-item"><span class="indent" style="width:16px"></span>&#9634; Viewport</div>
+      <div class="hierarchy-item"><span class="indent" style="width:32px"></span>&#9634; Content</div>
+      <div class="hierarchy-item"><span class="indent" style="width:48px"></span>&#128196; Item 1</div>
+      <div class="hierarchy-item"><span class="indent" style="width:48px"></span>&#128196; Item 2</div>
+      <div class="hierarchy-item"><span class="indent" style="width:48px"></span>&#128196; ...</div>
+      <div class="hierarchy-item"><span class="indent" style="width:16px"></span>&#9634; Scrollbar Vertical</div>
+    </div>
+    <div class="unity-note"><strong>Content Size Fitter</strong> &mdash; add this to the Content object and set Vertical Fit to "Preferred Size". This makes the Content grow to fit all its children.</div>
+  </div>
+
+  <!-- Interactive Scroll Demo -->
+  <div class="demo-box">
+    <div class="demo-label">LIVE PREVIEW</div>
+    <div style="max-width:360px;margin:0 auto">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--dim);margin-bottom:6px;letter-spacing:1px">INVENTORY (scroll me)</div>
+      <div class="scroll-demo" id="scrollDemo"></div>
+    </div>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- ── 08 ── -->
+<section class="lesson" id="s8">
+  <div class="lesson-head"><span class="lesson-num">08</span><h2 class="lesson-title">Health Bar</h2></div>
+  <div class="card">
+    <p>Time to build something real. A <strong>health bar</strong> combines an Image (Filled), a Text label, and a script.</p>
+    <div class="analogy">It's a progress bar &mdash; the fill width represents the percentage, and the colour changes based on value.</div>
+  </div>
+
+  <!-- Interactive Health Bar -->
+  <div class="demo-box">
+    <div class="demo-label">LIVE PREVIEW</div>
+    <div style="max-width:360px;margin:0 auto;padding:16px 0">
+      <div class="health-bar-wrap">
+        <div class="health-bar-bg">
+          <div class="health-bar-fill" id="healthFill" style="width:100%;background:#34d399"></div>
+        </div>
+        <div class="health-text" id="healthText" style="color:#34d399">HP: 100 / 100</div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap">
+        <button class="btn" id="btnDamage" style="border-color:#ff6b6b;color:#ff6b6b">Take Damage (-5 to -20)</button>
+        <button class="btn" id="btnHeal" style="border-color:var(--accent4);color:var(--accent4)">Heal +10</button>
+        <button class="btn" id="btnReset">Reset</button>
+      </div>
+      <div class="ctrl" style="margin-top:8px">
+        <label>HP:</label>
+        <input type="range" id="healthSlider" min="0" max="100" value="100" style="flex:1;accent-color:var(--accent)">
+        <span class="vv" id="healthSliderVal">100</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p><strong>Hierarchy for a health bar:</strong></p>
+    <div class="hierarchy">
+      <div class="hierarchy-title">Hierarchy</div>
+      <div class="hierarchy-item"><span class="indent" style="width:0"></span>&#9634; Canvas</div>
+      <div class="hierarchy-item selected"><span class="indent" style="width:16px"></span>&#9634; HealthBar</div>
+      <div class="hierarchy-item"><span class="indent" style="width:32px"></span>&#9635; Background (Image, dark)</div>
+      <div class="hierarchy-item"><span class="indent" style="width:32px"></span>&#9635; Fill (Image, Filled type)</div>
+      <div class="hierarchy-item"><span class="indent" style="width:32px"></span>&#128196; HP Text (TMP)</div>
+    </div>
+    <div class="inspector">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> Image (Fill)</div>
+      <div class="inspector-row"><div class="inspector-label">Image Type</div><div class="inspector-val"><span class="highlight">Filled</span></div></div>
+      <div class="inspector-row"><div class="inspector-label">Fill Method</div><div class="inspector-val">Horizontal</div></div>
+      <div class="inspector-row"><div class="inspector-label">Fill Amount</div><div class="inspector-val"><span class="highlight">1.0</span></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="code-head">
+      <span class="code-label">C# &mdash; Health bar script</span>
+      <div><button class="cbtn" onclick="copyEl('code-08')">Copy</button></div>
+    </div>
+    <pre><code id="code-08"><span class="kw">using</span> UnityEngine;
+<span class="kw">using</span> UnityEngine.UI;
+<span class="kw">using</span> TMPro;
+
+<span class="kw">public class</span> <span class="ty">HealthBar</span> : <span class="ty">MonoBehaviour</span>
+{
+    [<span class="ty">SerializeField</span>] <span class="ty">Image</span> fillImage;
+    [<span class="ty">SerializeField</span>] <span class="ty">TMP_Text</span> hpText;
+
+    <span class="kw">int</span> maxHP = <span class="nm">100</span>;
+    <span class="kw">int</span> currentHP;
+
+    <span class="kw">void</span> <span class="fn">Start</span>()
+    {
+        currentHP = maxHP;
+        UpdateBar();
+    }
+
+    <span class="kw">public void</span> <span class="fn">TakeDamage</span>(<span class="kw">int</span> amount)
+    {
+        currentHP = Mathf.Max(<span class="nm">0</span>, currentHP - amount);
+        UpdateBar();
+    }
+
+    <span class="kw">public void</span> <span class="fn">Heal</span>(<span class="kw">int</span> amount)
+    {
+        currentHP = Mathf.Min(maxHP, currentHP + amount);
+        UpdateBar();
+    }
+
+    <span class="kw">void</span> <span class="fn">UpdateBar</span>()
+    {
+        <span class="kw">float</span> ratio = (<span class="kw">float</span>)currentHP / maxHP;
+        fillImage.fillAmount = ratio;
+        hpText.text = <span class="st">"HP: "</span> + currentHP + <span class="st">" / "</span> + maxHP;
+
+        <span class="cm">// Color shifts: green -> yellow -> red</span>
+        <span class="kw">if</span> (ratio > <span class="nm">0.5f</span>)
+            fillImage.color = <span class="ty">Color</span>.Lerp(
+                <span class="ty">Color</span>.yellow, <span class="ty">Color</span>.green,
+                (ratio - <span class="nm">0.5f</span>) * <span class="nm">2f</span>);
+        <span class="kw">else</span>
+            fillImage.color = <span class="ty">Color</span>.Lerp(
+                <span class="ty">Color</span>.red, <span class="ty">Color</span>.yellow,
+                ratio * <span class="nm">2f</span>);
+    }
+}</code></pre>
+    <div class="success-note"><strong>You built a health bar!</strong> This same pattern works for mana bars, stamina bars, XP bars, loading bars &mdash; anything that fills.</div>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- ── 09 ── -->
+<section class="lesson" id="s9">
+  <div class="lesson-head"><span class="lesson-num">09</span><h2 class="lesson-title">Pause Menu</h2></div>
+  <div class="card">
+    <p>A <strong>pause menu</strong> is a Panel that covers the screen. Press Escape &rarr; show it. Click Resume &rarr; hide it. Time stops when paused.</p>
+    <div class="analogy">Like a modal dialog in HTML &mdash; an overlay div that blocks interaction with the page underneath.</div>
+  </div>
+
+  <!-- Interactive Pause Menu Demo -->
+  <div class="demo-box">
+    <div class="demo-label">LIVE PREVIEW</div>
+    <div class="pause-viewport" id="pauseViewport">
+      <div class="pause-game-content">
+        <div style="font-size:20px;margin-bottom:6px;color:rgba(255,255,255,0.5)">YOUR GAME</div>
+        <div>Objects moving around...</div>
+        <button class="btn" id="btnPause" style="margin-top:14px;border-color:var(--accent);color:var(--accent)">Press ESC (or click me)</button>
+      </div>
+      <div class="pause-overlay" id="pauseOverlay">
+        <div class="pause-title">PAUSED</div>
+        <button class="pause-btn" id="btnResume">Resume</button>
+        <button class="pause-btn">Settings</button>
+        <button class="pause-btn">Quit</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p><strong>Hierarchy:</strong></p>
+    <div class="hierarchy">
+      <div class="hierarchy-title">Hierarchy</div>
+      <div class="hierarchy-item"><span class="indent" style="width:0"></span>&#9634; Canvas</div>
+      <div class="hierarchy-item"><span class="indent" style="width:16px"></span>&#9634; GameUI (HUD, score, etc.)</div>
+      <div class="hierarchy-item selected"><span class="indent" style="width:16px"></span>&#9634; PausePanel (initially inactive)</div>
+      <div class="hierarchy-item"><span class="indent" style="width:32px"></span>&#9635; DarkOverlay (Image, black 75%)</div>
+      <div class="hierarchy-item"><span class="indent" style="width:32px"></span>&#128196; "PAUSED" Text (TMP)</div>
+      <div class="hierarchy-item"><span class="indent" style="width:32px"></span>&#9634; ResumeButton</div>
+      <div class="hierarchy-item"><span class="indent" style="width:32px"></span>&#9634; SettingsButton</div>
+      <div class="hierarchy-item"><span class="indent" style="width:32px"></span>&#9634; QuitButton</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="code-head">
+      <span class="code-label">C# &mdash; Pause toggle script</span>
+      <div><button class="cbtn" onclick="copyEl('code-09')">Copy</button></div>
+    </div>
+    <pre><code id="code-09"><span class="kw">using</span> UnityEngine;
+
+<span class="kw">public class</span> <span class="ty">PauseMenu</span> : <span class="ty">MonoBehaviour</span>
+{
+    [<span class="ty">SerializeField</span>] <span class="ty">GameObject</span> pausePanel;
+    <span class="kw">bool</span> isPaused = <span class="nm">false</span>;
+
+    <span class="kw">void</span> <span class="fn">Update</span>()
+    {
+        <span class="kw">if</span> (Input.GetKeyDown(<span class="ty">KeyCode</span>.Escape))
+            TogglePause();
+    }
+
+    <span class="kw">public void</span> <span class="fn">TogglePause</span>()
+    {
+        isPaused = !isPaused;
+        pausePanel.SetActive(isPaused);
+
+        <span class="cm">// Freeze / unfreeze time</span>
+        <span class="ty">Time</span>.timeScale = isPaused ? <span class="nm">0f</span> : <span class="nm">1f</span>;
+
+        <span class="cm">// Show cursor when paused</span>
+        <span class="ty">Cursor</span>.lockState = isPaused
+            ? <span class="ty">CursorLockMode</span>.None
+            : <span class="ty">CursorLockMode</span>.Locked;
+    }
+
+    <span class="kw">public void</span> <span class="fn">ResumeGame</span>()
+    {
+        isPaused = <span class="nm">true</span>; <span class="cm">// flipped to false inside</span>
+        TogglePause();
+    }
+
+    <span class="kw">public void</span> <span class="fn">QuitGame</span>()
+    {
+        <span class="ty">Time</span>.timeScale = <span class="nm">1f</span>;
+        Application.Quit();
+    }
+}</code></pre>
+    <div class="warn-note"><strong>Time.timeScale = 0</strong> freezes all physics and time-based animations. Always set it back to 1 when resuming!</div>
+  </div>
+</section>
+
+</div>
+
+<!-- ══ BONUS ══ -->
+<div class="part-div"><div class="part-inner" style="background:linear-gradient(135deg,rgba(52,211,153,0.06),transparent)">
+  <div class="part-label" style="color:var(--accent4)">Bonus</div>
+  <div class="part-title">Polish</div>
+  <p class="part-desc">Anchoring, Canvas Groups, and fading UI elements.</p>
+</div></div>
+
+<div class="wrap">
+
+<!-- ── 10 ── -->
+<section class="lesson" id="s10">
+  <div class="lesson-head"><span class="lesson-num" style="color:var(--accent4);background:rgba(52,211,153,0.12);border-color:rgba(52,211,153,0.25)">10</span><h2 class="lesson-title">Anchoring &amp; Canvas Group</h2></div>
+  <div class="card">
+    <p><strong>Anchors</strong> control where a UI element stays when the screen resizes. Get them wrong and your UI breaks on different resolutions.</p>
+    <div class="analogy">Anchors are like CSS position: fixed combined with top/left/right/bottom. They pin your element to a part of the screen.</div>
+  </div>
+
+  <!-- Interactive Anchor Grid -->
+  <div class="demo-box">
+    <div class="demo-label">LIVE PREVIEW</div>
+    <div class="two">
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--dim);margin-bottom:6px;letter-spacing:1px">CLICK AN ANCHOR POSITION</div>
+        <div class="anchor-grid" id="anchorGrid">
+          <div class="anchor-cell active" data-anchor="top-left"><div style="font-size:16px">&#8598;</div><span>Top Left</span></div>
+          <div class="anchor-cell" data-anchor="top-center"><div style="font-size:16px">&#8593;</div><span>Top Center</span></div>
+          <div class="anchor-cell" data-anchor="top-right"><div style="font-size:16px">&#8599;</div><span>Top Right</span></div>
+          <div class="anchor-cell" data-anchor="middle-left"><div style="font-size:16px">&#8592;</div><span>Mid Left</span></div>
+          <div class="anchor-cell" data-anchor="center"><div style="font-size:16px">&#9679;</div><span>Center</span></div>
+          <div class="anchor-cell" data-anchor="middle-right"><div style="font-size:16px">&#8594;</div><span>Mid Right</span></div>
+          <div class="anchor-cell" data-anchor="bottom-left"><div style="font-size:16px">&#8601;</div><span>Bot Left</span></div>
+          <div class="anchor-cell" data-anchor="bottom-center"><div style="font-size:16px">&#8595;</div><span>Bot Center</span></div>
+          <div class="anchor-cell" data-anchor="bottom-right"><div style="font-size:16px">&#8600;</div><span>Bot Right</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--dim);margin-bottom:6px;letter-spacing:1px">PREVIEW</div>
+        <div class="anchor-preview" id="anchorPreview">
+          <div class="anchor-dot" id="anchorDot" style="top:4px;left:4px">UI</div>
+        </div>
+        <div class="anchor-desc" id="anchorDesc">Top Left &mdash; HUD elements, score counters, minimap</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p><strong>Canvas Group</strong> &mdash; controls the alpha (opacity), interactability, and raycast blocking of a whole panel and all its children at once.</p>
+    <div class="inspector">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> Canvas Group</div>
+      <div class="inspector-row"><div class="inspector-label">Alpha</div><div class="inspector-val"><span class="highlight">1</span> (0 = invisible, 1 = fully visible)</div></div>
+      <div class="inspector-row"><div class="inspector-label">Interactable</div><div class="inspector-val">&#9745;</div></div>
+      <div class="inspector-row"><div class="inspector-label">Blocks Raycasts</div><div class="inspector-val">&#9745;</div></div>
+    </div>
+    <div class="unity-note"><strong>Canvas Group</strong> is the easiest way to fade a panel in or out. Animate the Alpha from 0 to 1.</div>
+  </div>
+
+  <div class="card">
+    <div class="code-head">
+      <span class="code-label">C# &mdash; Fade coroutine using Canvas Group</span>
+      <div><button class="cbtn" onclick="copyEl('code-10')">Copy</button></div>
+    </div>
+    <pre><code id="code-10"><span class="kw">using</span> System.Collections;
+<span class="kw">using</span> UnityEngine;
+
+<span class="kw">public class</span> <span class="ty">UIFader</span> : <span class="ty">MonoBehaviour</span>
+{
+    [<span class="ty">SerializeField</span>] <span class="ty">CanvasGroup</span> panel;
+    [<span class="ty">SerializeField</span>] <span class="kw">float</span> fadeDuration = <span class="nm">0.3f</span>;
+
+    <span class="kw">public void</span> <span class="fn">FadeIn</span>()
+    {
+        panel.gameObject.SetActive(<span class="nm">true</span>);
+        StartCoroutine(Fade(<span class="nm">0f</span>, <span class="nm">1f</span>));
+    }
+
+    <span class="kw">public void</span> <span class="fn">FadeOut</span>()
+    {
+        StartCoroutine(FadeAndDisable());
+    }
+
+    <span class="ty">IEnumerator</span> <span class="fn">Fade</span>(<span class="kw">float</span> from, <span class="kw">float</span> to)
+    {
+        <span class="kw">float</span> elapsed = <span class="nm">0f</span>;
+        <span class="kw">while</span> (elapsed < fadeDuration)
+        {
+            elapsed += <span class="ty">Time</span>.unscaledDeltaTime;
+            panel.alpha = Mathf.Lerp(from, to,
+                elapsed / fadeDuration);
+            <span class="kw">yield return null</span>;
+        }
+        panel.alpha = to;
+        panel.interactable = to > <span class="nm">0.5f</span>;
+        panel.blocksRaycasts = to > <span class="nm">0.5f</span>;
+    }
+
+    <span class="ty">IEnumerator</span> <span class="fn">FadeAndDisable</span>()
+    {
+        <span class="kw">yield return</span> Fade(<span class="nm">1f</span>, <span class="nm">0f</span>);
+        panel.gameObject.SetActive(<span class="nm">false</span>);
+    }
+}</code></pre>
+    <div class="unity-note"><strong>Time.unscaledDeltaTime</strong> keeps the fade working even when Time.timeScale = 0 (game is paused).</div>
+  </div>
+</section>
+
+</div>
+
+<!-- ══ CHECKLIST ══ -->
+<div class="checklist" id="checklist">
+  <div class="checklist-card">
+    <h2>Your Unity UI Checklist</h2>
+    <div class="checklist-item" data-check="0"><input type="checkbox"> Created a Canvas with Canvas Scaler set to Scale With Screen Size (1920x1080)</div>
+    <div class="checklist-item" data-check="1"><input type="checkbox"> Added TextMeshPro text and imported TMP Essentials</div>
+    <div class="checklist-item" data-check="2"><input type="checkbox"> Created a Button with Color Tint transition</div>
+    <div class="checklist-item" data-check="3"><input type="checkbox"> Wired an OnClick event (Inspector or via script)</div>
+    <div class="checklist-item" data-check="4"><input type="checkbox"> Imported a sprite and used an Image component</div>
+    <div class="checklist-item" data-check="5"><input type="checkbox"> Used a Layout Group (Vertical, Horizontal, or Grid)</div>
+    <div class="checklist-item" data-check="6"><input type="checkbox"> Created a Slider and connected OnValueChanged</div>
+    <div class="checklist-item" data-check="7"><input type="checkbox"> Built a Scroll View with Content Size Fitter on Content</div>
+    <div class="checklist-item" data-check="8"><input type="checkbox"> Built a health bar with Filled image type and colour lerp</div>
+    <div class="checklist-item" data-check="9"><input type="checkbox"> Built a pause menu with Time.timeScale = 0</div>
+    <div class="checklist-item" data-check="10"><input type="checkbox"> Set proper anchors for at least one UI element</div>
+    <div class="checklist-item" data-check="11"><input type="checkbox"> Used Canvas Group to fade a panel in/out</div>
+  </div>
+</div>
+
+<footer>Unity Canvas Journey &mdash; 4E Virtual Design</footer>
+
+<!-- ═══════════ JAVASCRIPT ═══════════ -->
+<script>
+(function(){
+
+/* ── Copy Button ── */
+window.copyEl = function(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  var text = el.textContent || el.innerText;
+  navigator.clipboard.writeText(text).then(function() {
+    var btns = document.querySelectorAll('.cbtn');
+    btns.forEach(function(b) {
+      if (b.getAttribute('onclick') && b.getAttribute('onclick').indexOf(id) !== -1) {
+        b.classList.add('ok');
+        b.textContent = 'Copied!';
+        setTimeout(function(){ b.classList.remove('ok'); b.textContent = 'Copy'; }, 1500);
+      }
+    });
+  });
+};
+
+/* ── 00: Element Card Grid ── */
+var elDescriptions = {
+  panel: '<strong style="color:var(--accent)">Panel</strong> &mdash; A container with a background Image component. Like a &lt;div&gt; with background-color. Use it to group related UI elements together. Every Panel is really just a GameObject + Image.',
+  button: '<strong style="color:var(--accent)">Button</strong> &mdash; Clickable element with four states: Normal, Highlighted, Pressed, Disabled. Has a child Text (TMP) for the label. Wire OnClick events in the Inspector or via script.',
+  text: '<strong style="color:var(--accent)">Text (TMP)</strong> &mdash; TextMeshPro text. Razor-sharp at any size. Supports rich text tags like &lt;b&gt;, &lt;color=#ff0000&gt;, &lt;size=20&gt;. Always use TMP instead of legacy Text.',
+  image: '<strong style="color:var(--accent)">Image</strong> &mdash; Displays a Sprite. Can be Simple (stretched), Sliced (9-slice borders), Tiled (repeating), or Filled (partial reveal &mdash; perfect for health bars).',
+  slider: '<strong style="color:var(--accent)">Slider</strong> &mdash; Drag a handle to pick a value between Min and Max. Composed of Background, Fill Area/Fill, and Handle. Connect OnValueChanged to a script function.',
+  toggle: '<strong style="color:var(--accent)">Toggle</strong> &mdash; On/off checkbox. Has a Background image, a Checkmark child that shows/hides, and an optional Label. Fires OnValueChanged(bool).',
+  dropdown: '<strong style="color:var(--accent)">Dropdown</strong> &mdash; Click to expand a list of options. The player picks one. Uses TMP_Dropdown for TextMeshPro support. Fires OnValueChanged(int) with the selected index.',
+  inputfield: '<strong style="color:var(--accent)">Input Field</strong> &mdash; Editable text box where the player can type. Has placeholder text, content type (Standard, Integer, Password), and character limit settings.',
+  scrollview: '<strong style="color:var(--accent)">Scroll View</strong> &mdash; Scrollable container. Has a Viewport (mask), Content (the actual scrollable area), and optional scrollbars. Add a Content Size Fitter to Content for auto-sizing.'
+};
+
+document.getElementById('elGrid').addEventListener('click', function(e) {
+  var card = e.target.closest('.element-card');
+  if (!card) return;
+  var key = card.getAttribute('data-el');
+  var info = document.getElementById('elInfo');
+  document.querySelectorAll('.element-card').forEach(function(c){ c.classList.remove('active'); });
+  card.classList.add('active');
+  info.innerHTML = elDescriptions[key] || '';
+  info.classList.add('show');
+});
+
+/* ── 03: Interactive Button States ── */
+var demoBtn = document.getElementById('demoBtn');
+var btnStateEl = document.getElementById('btnState');
+var btnNormalInput = document.getElementById('btnNormal');
+var btnHoverInput = document.getElementById('btnHover');
+var btnPressedInput = document.getElementById('btnPressed');
+
+function setBtnVisual(color, state) {
+  demoBtn.style.background = color;
+  btnStateEl.textContent = state;
+}
+
+demoBtn.addEventListener('mouseenter', function() {
+  setBtnVisual(btnHoverInput.value, 'Highlighted');
+});
+demoBtn.addEventListener('mouseleave', function() {
+  setBtnVisual(btnNormalInput.value, 'Normal');
+  demoBtn.style.transform = 'scale(1)';
+});
+demoBtn.addEventListener('mousedown', function() {
+  setBtnVisual(btnPressedInput.value, 'Pressed');
+  demoBtn.style.transform = 'scale(0.96)';
+});
+demoBtn.addEventListener('mouseup', function() {
+  setBtnVisual(btnHoverInput.value, 'Highlighted');
+  demoBtn.style.transform = 'scale(1)';
+});
+btnNormalInput.addEventListener('input', function() {
+  demoBtn.style.background = btnNormalInput.value;
+});
+
+/* ── 05: Interactive Layout Demo ── */
+var layoutContainer = document.getElementById('layoutContainer');
+var layBtns = document.querySelectorAll('[data-layout]');
+var laySpacing = document.getElementById('laySpacing');
+var layPadding = document.getElementById('layPadding');
+var currentLayout = 'vertical';
+
+function updateLayout() {
+  var gap = laySpacing.value + 'px';
+  var pad = layPadding.value + 'px';
+  document.getElementById('laySpacingVal').textContent = gap;
+  document.getElementById('layPaddingVal').textContent = pad;
+
+  layoutContainer.className = 'layout-container';
+  layoutContainer.style.gap = gap;
+  layoutContainer.style.padding = pad;
+
+  if (currentLayout === 'horizontal') {
+    layoutContainer.classList.add('horizontal');
+  } else if (currentLayout === 'grid') {
+    layoutContainer.classList.add('grid-mode');
+  }
+}
+
+layBtns.forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    layBtns.forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    currentLayout = btn.getAttribute('data-layout');
+    updateLayout();
+  });
+});
+laySpacing.addEventListener('input', updateLayout);
+layPadding.addEventListener('input', updateLayout);
+
+/* ── 06: Interactive Slider + Toggle ── */
+var demoSlider = document.getElementById('demoSlider');
+var demoSliderVal = document.getElementById('demoSliderVal');
+var demoSliderFill = document.getElementById('demoSliderFill');
+
+demoSlider.addEventListener('input', function() {
+  demoSliderVal.textContent = demoSlider.value;
+  demoSliderFill.style.width = demoSlider.value + '%';
+});
+
+var demoToggle = document.getElementById('demoToggle');
+var demoToggleTrack = document.getElementById('demoToggleTrack');
+var demoToggleVal = document.getElementById('demoToggleVal');
+var toggleOn = true;
+
+demoToggle.addEventListener('click', function() {
+  toggleOn = !toggleOn;
+  demoToggleTrack.classList.toggle('on', toggleOn);
+  demoToggleVal.textContent = toggleOn ? 'ON' : 'OFF';
+});
+
+/* ── 07: Scroll Demo ── */
+var scrollDemo = document.getElementById('scrollDemo');
+var scrollItems = [
+  'Iron Sword  (+5 ATK)', 'Wooden Shield  (+3 DEF)', 'Health Potion x3', 'Mana Potion x1',
+  'Leather Armor  (+8 DEF)', 'Gold Ring  (+2 LCK)', 'Fire Scroll', 'Ice Wand  (+12 MAG)',
+  'Dragon Scale', 'Phoenix Feather', 'Enchanted Bow  (+10 ATK)', 'Silver Arrow x10',
+  'Healing Herb x5', 'Teleport Stone', 'Ancient Map', 'Crystal Key',
+  'Shadow Cloak  (+5 AGI)', 'Thunder Staff  (+15 MAG)', 'Ruby Pendant  (+3 CHA)'
+];
+scrollItems.forEach(function(item, i) {
+  var div = document.createElement('div');
+  div.className = 'scroll-item';
+  div.textContent = (i + 1) + '.  ' + item;
+  scrollDemo.appendChild(div);
+});
+
+/* ── 08: Interactive Health Bar ── */
+var hp = 100;
+var maxHP = 100;
+var healthFill = document.getElementById('healthFill');
+var healthText = document.getElementById('healthText');
+var healthSlider = document.getElementById('healthSlider');
+var healthSliderVal = document.getElementById('healthSliderVal');
+
+function getHealthColor(ratio) {
+  var r, g, b;
+  if (ratio > 0.5) {
+    var t = (ratio - 0.5) * 2;
+    r = Math.round(255 - t * 203);
+    g = Math.round(211);
+    b = Math.round(0 + t * 153);
+  } else {
+    var t2 = ratio * 2;
+    r = 255;
+    g = Math.round(211 * t2);
+    b = 0;
+  }
+  return 'rgb(' + r + ',' + g + ',' + b + ')';
+}
+
+function updateHealth() {
+  hp = Math.max(0, Math.min(maxHP, hp));
+  var ratio = hp / maxHP;
+  healthFill.style.width = (ratio * 100) + '%';
+  healthSlider.value = hp;
+  healthSliderVal.textContent = hp;
+  healthText.textContent = 'HP: ' + hp + ' / ' + maxHP;
+  var color = getHealthColor(ratio);
+  healthFill.style.background = color;
+  healthText.style.color = color;
+}
+
+document.getElementById('btnDamage').addEventListener('click', function() {
+  hp -= Math.floor(Math.random() * 16) + 5;
+  updateHealth();
+});
+
+document.getElementById('btnHeal').addEventListener('click', function() {
+  hp += 10;
+  updateHealth();
+});
+
+document.getElementById('btnReset').addEventListener('click', function() {
+  hp = 100;
+  updateHealth();
+});
+
+healthSlider.addEventListener('input', function() {
+  hp = parseInt(healthSlider.value);
+  updateHealth();
+});
+
+/* ── 09: Interactive Pause Menu ── */
+var pauseOverlay = document.getElementById('pauseOverlay');
+var paused = false;
+
+function togglePause() {
+  paused = !paused;
+  pauseOverlay.classList.toggle('show', paused);
+}
+
+document.getElementById('btnPause').addEventListener('click', togglePause);
+document.getElementById('btnResume').addEventListener('click', togglePause);
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    var viewport = document.getElementById('pauseViewport');
+    var rect = viewport.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      e.preventDefault();
+      togglePause();
+    }
+  }
+});
+
+/* ── 10: Interactive Anchor Grid ── */
+var anchorPositions = {
+  'top-left':      { top:'4px',  left:'4px',  right:'auto', bottom:'auto', mt:'0',    ml:'0',    desc:'Top Left -- HUD scores, minimap, player info' },
+  'top-center':    { top:'4px',  left:'50%',  right:'auto', bottom:'auto', mt:'0',    ml:'-20px', desc:'Top Center -- wave indicator, level title, timer' },
+  'top-right':     { top:'4px',  left:'auto', right:'4px',  bottom:'auto', mt:'0',    ml:'0',    desc:'Top Right -- settings button, pause, currency' },
+  'middle-left':   { top:'50%',  left:'4px',  right:'auto', bottom:'auto', mt:'-12px',ml:'0',    desc:'Middle Left -- side panels, inventory' },
+  'center':        { top:'50%',  left:'50%',  right:'auto', bottom:'auto', mt:'-12px',ml:'-20px', desc:'Center -- popups, dialogs, pause menu' },
+  'middle-right':  { top:'50%',  left:'auto', right:'4px',  bottom:'auto', mt:'-12px',ml:'0',    desc:'Middle Right -- side panels, action bars' },
+  'bottom-left':   { top:'auto', left:'4px',  right:'auto', bottom:'4px',  mt:'0',    ml:'0',    desc:'Bottom Left -- health bar, player stats' },
+  'bottom-center': { top:'auto', left:'50%',  right:'auto', bottom:'4px',  mt:'0',    ml:'-20px', desc:'Bottom Center -- hotbar, ability bar' },
+  'bottom-right':  { top:'auto', left:'auto', right:'4px',  bottom:'4px',  mt:'0',    ml:'0',    desc:'Bottom Right -- minimap, chat window' }
+};
+
+var anchorDot = document.getElementById('anchorDot');
+var anchorDescEl = document.getElementById('anchorDesc');
+
+document.getElementById('anchorGrid').addEventListener('click', function(e) {
+  var cell = e.target.closest('.anchor-cell');
+  if (!cell) return;
+  var key = cell.getAttribute('data-anchor');
+  var pos = anchorPositions[key];
+  if (!pos) return;
+
+  document.querySelectorAll('.anchor-cell').forEach(function(c){ c.classList.remove('active'); });
+  cell.classList.add('active');
+
+  anchorDot.style.top = pos.top;
+  anchorDot.style.left = pos.left;
+  anchorDot.style.right = pos.right;
+  anchorDot.style.bottom = pos.bottom;
+  anchorDot.style.marginTop = pos.mt;
+  anchorDot.style.marginLeft = pos.ml;
+
+  anchorDescEl.textContent = pos.desc;
+});
+
+/* ── Checklist ── */
+document.querySelectorAll('.checklist-item').forEach(function(item) {
+  var cb = item.querySelector('input[type="checkbox"]');
+  item.addEventListener('click', function(e) {
+    if (e.target !== cb) cb.checked = !cb.checked;
+    item.classList.toggle('checked', cb.checked);
+  });
+});
+
+/* ── Nav pill active state on scroll ── */
+var sections = document.querySelectorAll('.lesson');
+var navLinks = document.querySelectorAll('.nav a');
+
+function updateNav() {
+  var scrollY = window.scrollY + 120;
+  sections.forEach(function(s) {
+    var top = s.offsetTop;
+    var bottom = top + s.offsetHeight;
+    var id = s.id;
+    navLinks.forEach(function(link) {
+      if (link.getAttribute('href') === '#' + id) {
+        link.classList.toggle('active', scrollY >= top && scrollY < bottom);
+      }
+    });
+  });
+}
+
+var scrollTimer;
+window.addEventListener('scroll', function() {
+  clearTimeout(scrollTimer);
+  scrollTimer = setTimeout(updateNav, 50);
+});
+
+})();
+</script>
+</body>
+</html>

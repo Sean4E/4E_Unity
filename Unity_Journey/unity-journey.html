@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unity Journey - Interactive Scene</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07080f;--surface:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--accent:#84cc16;--accent2:#38bdf8;--accent3:#f97316;--accent4:#34d399;--text:#e8eaf0;--dim:#7a7f96;--code-bg:rgba(0,0,0,0.5);--mono:'Space Mono',monospace;--display:'Syne',sans-serif}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--display);line-height:1.7}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(132,204,22,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(132,204,22,0.02) 1px,transparent 1px);background-size:60px 60px}
+
+/* Hero */
+.hero{position:relative;padding:70px 40px 30px;text-align:center;z-index:1}
+.hero-badge{display:inline-block;background:rgba(132,204,22,0.15);border:1px solid rgba(132,204,22,0.3);color:var(--accent);font-family:var(--mono);font-size:11px;letter-spacing:3px;text-transform:uppercase;padding:6px 18px;border-radius:100px;margin-bottom:24px}
+.hero h1{font-size:clamp(34px,6vw,68px);font-weight:800;line-height:1.05;letter-spacing:-2px;margin-bottom:16px}
+.hero h1 .green{color:var(--accent)}
+.hero p{font-size:16px;color:var(--dim);max-width:620px;margin:0 auto 12px;line-height:1.8}
+.hero-sub{font-family:var(--mono);font-size:11px;color:#3f4460;letter-spacing:1px}
+
+/* Nav */
+.nav{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:0 40px 40px;z-index:1;position:relative}
+.nav a{background:var(--surface);border:1px solid var(--border);color:var(--dim);font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:100px;text-decoration:none;transition:all 0.2s;letter-spacing:0.5px}
+.nav a:hover{background:rgba(132,204,22,0.15);border-color:rgba(132,204,22,0.4);color:var(--accent)}
+.nav-div{width:100%;text-align:center;font-family:var(--mono);font-size:10px;color:#2a2d3a;letter-spacing:2px;padding:4px 0}
+
+/* Layout */
+.wrap{max-width:1100px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+.lesson{margin-bottom:50px}
+.lesson-head{display:flex;align-items:flex-start;gap:16px;margin-bottom:20px}
+.lesson-num{font-family:var(--mono);font-size:12px;color:var(--accent);background:rgba(132,204,22,0.12);border:1px solid rgba(132,204,22,0.25);padding:4px 10px;border-radius:6px;white-space:nowrap;margin-top:5px}
+.lesson-title{font-size:clamp(20px,3vw,30px);font-weight:800;letter-spacing:-1px;line-height:1.1}
+
+/* Cards */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px 26px;margin-bottom:16px;backdrop-filter:blur(8px)}
+.card p{font-size:15px;color:#c5cad8;line-height:1.85}
+.card strong{color:var(--accent);font-weight:700}
+.card .blue{color:var(--accent2)}
+.card .orange{color:var(--accent3)}
+.card ul,.card ol{margin-left:1.5rem;color:#c5cad8;line-height:1.85;font-size:15px}
+.card li{margin-bottom:0.35rem}
+.analogy{background:rgba(56,189,248,0.06);border-left:3px solid var(--accent2);padding:12px 18px;border-radius:0 10px 10px 0;margin:12px 0;font-size:14px;color:#a5c8e8;font-style:italic}
+.unity-note{background:rgba(132,204,22,0.06);border-left:3px solid var(--accent);padding:10px 16px;border-radius:0 10px 10px 0;margin:12px 0 0;font-size:13px;color:#b8e8a5;font-style:italic}
+.warn-note{background:rgba(249,115,22,0.06);border-left:3px solid var(--accent3);padding:10px 16px;border-radius:0 10px 10px 0;margin:12px 0 0;font-size:13px;color:#e8c8a5;font-style:italic}
+.success-note{background:rgba(52,211,153,0.06);border-left:3px solid var(--accent4);padding:10px 16px;border-radius:0 10px 10px 0;margin:12px 0 0;font-size:13px;color:#a5e8c8}
+
+/* Code */
+pre{background:var(--code-bg);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:18px 20px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.85;color:var(--text);margin-bottom:16px;white-space:pre}
+code{font-family:inherit}
+.kw{color:#c792ea}.st{color:#c3e88d}.nm{color:#f78c6c}.cm{color:#546e7a;font-style:italic}.ty{color:#82aaff}.fn{color:#82aaff}
+
+/* Grids */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+.two>div,.three>div{min-width:0}
+
+/* Inspector mock */
+.inspector{background:#2d2d2d;border:1px solid #555;border-radius:12px;padding:0;margin:12px 0;overflow:hidden;font-family:'Segoe UI',sans-serif;font-size:13px}
+.insp-header{background:#3d3d3d;padding:8px 14px;font-weight:600;display:flex;align-items:center;gap:8px;border-bottom:1px solid #555}
+.insp-header .cb{width:14px;height:14px;border:2px solid var(--accent);border-radius:3px;display:inline-block;background:var(--accent)}
+.insp-header .icon{font-size:16px}
+.insp-body{padding:10px 14px}
+.insp-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #3a3a3a}
+.insp-row:last-child{border-bottom:none}
+.insp-label{color:#bbb;font-size:12px}
+.insp-val{background:#1a1a1a;padding:3px 10px;border-radius:4px;color:#ddd;font-size:12px;min-width:100px;text-align:right}
+.insp-slot{background:#1a1a1a;padding:3px 10px;border-radius:4px;color:#888;font-size:12px;min-width:160px;text-align:center;border:1px dashed #555}
+.insp-slot.filled{color:var(--accent);border-style:solid;border-color:var(--accent)}
+.insp-event{background:#1a1a1a;border:1px solid #444;border-radius:8px;padding:10px;margin-top:8px}
+.insp-event-head{font-size:11px;color:#888;margin-bottom:6px;font-family:var(--mono)}
+.insp-event-row{display:flex;gap:6px;align-items:center}
+.insp-event-obj{background:#2a2a2a;padding:3px 8px;border-radius:4px;color:var(--accent);font-size:12px;flex:1}
+.insp-event-fn{background:#2a2a2a;padding:3px 8px;border-radius:4px;color:var(--accent2);font-size:12px;flex:1}
+
+/* Hierarchy mock */
+.hierarchy{background:#2d2d2d;border:1px solid #555;border-radius:12px;padding:12px 14px;margin:12px 0;font-family:var(--mono);font-size:12px}
+.hierarchy-title{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:8px;font-weight:700}
+.h-item{padding:3px 0;color:#ccc;display:flex;align-items:center;gap:6px}
+.h-item .icon{font-size:14px}
+.h-child{margin-left:20px}
+.h-item.selected{color:var(--accent);background:rgba(132,204,22,0.1);margin:0 -14px;padding:3px 14px;border-radius:4px}
+
+/* Sections */
+.part-div{max-width:1100px;margin:30px auto 20px;padding:0 24px}
+.part-inner{border:1px solid var(--border);border-radius:12px;padding:20px 24px;text-align:center;background:linear-gradient(135deg,rgba(132,204,22,0.06),transparent)}
+.part-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:3px;color:var(--accent);margin-bottom:4px}
+.part-title{font-size:22px;font-weight:800;margin-bottom:4px}
+.part-desc{color:var(--dim);font-size:14px}
+
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:40px 0}
+
+/* Steps list */
+.steps{counter-reset:step;list-style:none;margin:0}
+.steps li{counter-increment:step;position:relative;padding-left:36px;margin-bottom:12px;color:#c5cad8;font-size:15px}
+.steps li::before{content:counter(step);position:absolute;left:0;top:2px;width:24px;height:24px;line-height:24px;text-align:center;background:var(--accent);color:#000;border-radius:50%;font-size:12px;font-weight:700;font-family:var(--mono)}
+
+/* Checklist */
+.checklist{list-style:none;margin:0}
+.checklist li{padding:8px 0;border-bottom:1px solid var(--border);color:#c5cad8;font-size:15px;padding-left:28px;position:relative}
+.checklist li:last-child{border-bottom:none}
+.checklist li::before{content:'\2610';position:absolute;left:0;font-size:18px;color:var(--accent)}
+
+/* Comparison table */
+.compare{width:100%;border-collapse:collapse;margin:12px 0}
+.compare th{text-align:left;padding:8px 12px;font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid var(--border);font-family:var(--mono)}
+.compare td{padding:8px 12px;border-bottom:1px solid var(--border);color:#c5cad8;font-size:14px}
+.compare td code{background:var(--code-bg);padding:2px 6px;border-radius:4px;font-size:12px}
+
+footer{text-align:center;padding:36px 24px;color:var(--dim);font-family:var(--mono);font-size:11px;border-top:1px solid var(--border);margin-top:50px;position:relative;z-index:1}
+
+@media(max-width:850px){.two,.three{grid-template-columns:1fr}.hero{padding:50px 20px 20px}.nav{padding:0 16px 24px}.wrap{padding:0 14px}pre{font-size:11px;padding:14px}}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-badge">Build-Along Guide</div>
+  <h1>Unity <span class="green">Journey</span></h1>
+  <p>Eight steps to build an interactive first-person scene in Unity. Same ideas as your Three.js scene &mdash; shapes, lights, materials, animation &mdash; but now in a game engine.</p>
+  <div class="hero-sub">Week 9 &middot; Interactive Scene &middot; No Coding Required</div>
+</div>
+
+<div class="nav">
+  <a href="#s0">00 Concepts</a>
+  <a href="#s1">01 Project</a>
+  <a href="#s2">02 Environment</a>
+  <a href="#s3">03 Player</a>
+  <a href="#s4">04 Materials</a>
+  <a href="#s5">05 Lighting</a>
+  <a href="#s6">06 Interactions</a>
+  <a href="#s7">07 Polish</a>
+  <a href="#s8">08 Build</a>
+  <div class="nav-div">--</div>
+  <a href="#checklist">Checklist</a>
+  <a href="#comparison">Three.js &harr; Unity</a>
+</div>
+
+<!-- ══ PART: CONCEPTS ══ -->
+<div class="part-div"><div class="part-inner">
+  <div class="part-label">Foundation</div>
+  <div class="part-title">From Three.js to Unity</div>
+  <p class="part-desc">You already know these concepts from the browser. Now see how they translate to a game engine.</p>
+</div></div>
+
+<div class="wrap">
+
+<!-- ══ STEP 0: CONCEPTS ══ -->
+<div class="lesson" id="s0">
+  <div class="lesson-head">
+    <span class="lesson-num">00</span>
+    <h2 class="lesson-title">Three.js &rarr; Unity</h2>
+  </div>
+
+  <div class="card">
+    <p>Everything you built in Three.js has a direct equivalent in Unity. The names change, but the ideas are the same. Here's the map:</p>
+  </div>
+
+  <table class="compare">
+    <tr><th>Three.js</th><th>Unity</th><th>What It Does</th></tr>
+    <tr><td><code>new THREE.Scene()</code></td><td>Scene (Hierarchy window)</td><td>Container for all objects</td></tr>
+    <tr><td><code>new THREE.Mesh()</code></td><td>GameObject + MeshFilter + MeshRenderer</td><td>A visible 3D object</td></tr>
+    <tr><td><code>new THREE.BoxGeometry()</code></td><td>GameObject &rarr; 3D Object &rarr; Cube</td><td>A box shape</td></tr>
+    <tr><td><code>new THREE.MeshPhysicalMaterial()</code></td><td>Material asset (Standard or URP/Lit)</td><td>Surface appearance</td></tr>
+    <tr><td><code>new THREE.DirectionalLight()</code></td><td>Light &rarr; Directional Light</td><td>Sun-like light</td></tr>
+    <tr><td><code>new THREE.PointLight()</code></td><td>Light &rarr; Point Light</td><td>Light bulb</td></tr>
+    <tr><td><code>new THREE.AmbientLight()</code></td><td>Environment Lighting (Lighting window)</td><td>Fill light everywhere</td></tr>
+    <tr><td><code>new THREE.PerspectiveCamera()</code></td><td>Camera component on a GameObject</td><td>What the player sees</td></tr>
+    <tr><td><code>OrbitControls</code></td><td>PlayerController script</td><td>Camera movement</td></tr>
+    <tr><td><code>GLTFLoader</code></td><td>Drag &amp; drop into Assets folder</td><td>Import 3D models</td></tr>
+    <tr><td><code>scene.background</code></td><td>Skybox material (Lighting settings)</td><td>Background colour/image</td></tr>
+    <tr><td><code>requestAnimationFrame</code></td><td>Unity's Update loop (automatic)</td><td>Runs every frame</td></tr>
+  </table>
+
+  <div class="analogy">Think of Unity as "Three.js with a GUI". Instead of writing <code>scene.add(mesh)</code>, you drag objects into the Hierarchy. Instead of editing code values, you adjust sliders in the Inspector. Same result, different workflow.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══ STEP 1: NEW PROJECT ══ -->
+<div class="lesson" id="s1">
+  <div class="lesson-head">
+    <span class="lesson-num">01</span>
+    <h2 class="lesson-title">Create Your Project</h2>
+  </div>
+
+  <div class="card">
+    <p>Open <strong>Unity Hub</strong> and create a new project. Choose the <strong>3D (Built-in Render Pipeline)</strong> template &mdash; it's the simplest and most compatible.</p>
+    <ol class="steps">
+      <li>Open <strong>Unity Hub</strong> &rarr; Click <strong>New Project</strong></li>
+      <li>Select <strong>3D (Built-in Render Pipeline)</strong> template</li>
+      <li>Name your project (e.g. <code>InteractiveScene</code>)</li>
+      <li>Choose a save location</li>
+      <li>Click <strong>Create project</strong> and wait for Unity to open</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3 style="color:var(--accent);margin-bottom:8px">Organise Your Folders</h3>
+    <p>In the <strong>Project window</strong> (bottom panel), right-click in the Assets folder and create these folders:</p>
+    <ol class="steps">
+      <li>Right-click in Assets &rarr; Create &rarr; Folder &rarr; name it <strong>Scripts</strong></li>
+      <li>Create another folder called <strong>Materials</strong></li>
+      <li>Create another folder called <strong>Models</strong> (for any imported 3D models)</li>
+      <li>Create another folder called <strong>Audio</strong> (for any sound effects)</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3 style="color:var(--accent);margin-bottom:8px">Import the Scripts</h3>
+    <p>Download the 6 script files below and drag them into your <strong>Assets/Scripts</strong> folder in Unity's Project window.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;margin:14px 0">
+      <a href="../Scripts/PlayerController.cs" download style="display:flex;align-items:center;gap:8px;background:rgba(132,204,22,0.06);border:1px solid rgba(132,204,22,0.2);border-radius:8px;padding:10px 14px;text-decoration:none;color:var(--text);transition:all 0.2s;font-size:12px"><span style="font-size:18px">&#128190;</span><span><strong style="color:var(--accent)">PlayerController.cs</strong><br><span style="color:var(--dim);font-size:10px">First-person movement</span></span></a>
+      <a href="../Scripts/Interactable.cs" download style="display:flex;align-items:center;gap:8px;background:rgba(132,204,22,0.06);border:1px solid rgba(132,204,22,0.2);border-radius:8px;padding:10px 14px;text-decoration:none;color:var(--text);transition:all 0.2s;font-size:12px"><span style="font-size:18px">&#128190;</span><span><strong style="color:var(--accent)">Interactable.cs</strong><br><span style="color:var(--dim);font-size:10px">Press E detection</span></span></a>
+      <a href="../Scripts/Door.cs" download style="display:flex;align-items:center;gap:8px;background:rgba(132,204,22,0.06);border:1px solid rgba(132,204,22,0.2);border-radius:8px;padding:10px 14px;text-decoration:none;color:var(--text);transition:all 0.2s;font-size:12px"><span style="font-size:18px">&#128190;</span><span><strong style="color:var(--accent)">Door.cs</strong><br><span style="color:var(--dim);font-size:10px">Open/close doors</span></span></a>
+      <a href="../Scripts/Pickup.cs" download style="display:flex;align-items:center;gap:8px;background:rgba(132,204,22,0.06);border:1px solid rgba(132,204,22,0.2);border-radius:8px;padding:10px 14px;text-decoration:none;color:var(--text);transition:all 0.2s;font-size:12px"><span style="font-size:18px">&#128190;</span><span><strong style="color:var(--accent)">Pickup.cs</strong><br><span style="color:var(--dim);font-size:10px">Collect items + score</span></span></a>
+      <a href="../Scripts/LightSwitch.cs" download style="display:flex;align-items:center;gap:8px;background:rgba(132,204,22,0.06);border:1px solid rgba(132,204,22,0.2);border-radius:8px;padding:10px 14px;text-decoration:none;color:var(--text);transition:all 0.2s;font-size:12px"><span style="font-size:18px">&#128190;</span><span><strong style="color:var(--accent)">LightSwitch.cs</strong><br><span style="color:var(--dim);font-size:10px">Toggle lights on/off</span></span></a>
+      <a href="../Scripts/TriggerZone.cs" download style="display:flex;align-items:center;gap:8px;background:rgba(132,204,22,0.06);border:1px solid rgba(132,204,22,0.2);border-radius:8px;padding:10px 14px;text-decoration:none;color:var(--text);transition:all 0.2s;font-size:12px"><span style="font-size:18px">&#128190;</span><span><strong style="color:var(--accent)">TriggerZone.cs</strong><br><span style="color:var(--dim);font-size:10px">Area-based events</span></span></a>
+    </div>
+    <div class="unity-note">Wait for Unity to compile (the spinner in the bottom-right). If you see errors in the Console, check that all 6 files are in the Scripts folder.</div>
+  </div>
+
+  <div class="success-note"><strong>Checkpoint:</strong> You have a Unity project with organised folders and 6 scripts ready to use. The Console should show no errors.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══ STEP 2: BUILD THE ROOM ══ -->
+<div class="lesson" id="s2">
+  <div class="lesson-head">
+    <span class="lesson-num">02</span>
+    <h2 class="lesson-title">Build Your Environment</h2>
+  </div>
+
+  <div class="card">
+    <p>Just like you created shapes in Three.js with <code>BoxGeometry</code> and <code>SphereGeometry</code>, Unity has built-in primitives. Let's build a room.</p>
+  </div>
+
+  <div class="card">
+    <h3 style="color:var(--accent);margin-bottom:8px">Create the Floor</h3>
+    <ol class="steps">
+      <li>Right-click in the <strong>Hierarchy</strong> &rarr; <strong>3D Object</strong> &rarr; <strong>Plane</strong></li>
+      <li>Rename it to <strong>Floor</strong> (click the name in the Hierarchy)</li>
+      <li>In the Inspector, set <strong>Position</strong> to <code>X: 0, Y: 0, Z: 0</code></li>
+      <li>Set <strong>Scale</strong> to <code>X: 3, Y: 1, Z: 3</code> (makes a 30&times;30 metre floor)</li>
+    </ol>
+    <div class="analogy">In Three.js this was: <code>new THREE.Mesh(new THREE.PlaneGeometry(30, 30), material)</code> rotated to face up.</div>
+  </div>
+
+  <div class="card">
+    <h3 style="color:var(--accent);margin-bottom:8px">Create the Walls</h3>
+    <ol class="steps">
+      <li>Right-click in Hierarchy &rarr; 3D Object &rarr; <strong>Cube</strong></li>
+      <li>Rename it to <strong>Wall_Back</strong></li>
+      <li>Set Position: <code>X: 0, Y: 2, Z: 15</code></li>
+      <li>Set Scale: <code>X: 30, Y: 4, Z: 0.2</code></li>
+      <li><strong>Duplicate</strong> it (Ctrl+D) three times for the other walls</li>
+    </ol>
+    <p style="margin-top:12px">Position each wall:</p>
+  </div>
+
+  <table class="compare">
+    <tr><th>Wall</th><th>Position</th><th>Scale</th></tr>
+    <tr><td>Wall_Back</td><td><code>0, 2, 15</code></td><td><code>30, 4, 0.2</code></td></tr>
+    <tr><td>Wall_Front</td><td><code>0, 2, -15</code></td><td><code>30, 4, 0.2</code></td></tr>
+    <tr><td>Wall_Left</td><td><code>-15, 2, 0</code></td><td><code>0.2, 4, 30</code></td></tr>
+    <tr><td>Wall_Right</td><td><code>15, 2, 0</code></td><td><code>0.2, 4, 30</code></td></tr>
+  </table>
+
+  <div class="card">
+    <h3 style="color:var(--accent);margin-bottom:8px">Add Some Objects</h3>
+    <p>Add at least <strong>5 objects</strong> to fill your scene. Use primitives to prototype &mdash; you can replace them with imported models later:</p>
+    <ul>
+      <li><strong>Cube</strong> &mdash; table, crate, shelf, pillar, pedestal</li>
+      <li><strong>Sphere</strong> &mdash; ball, decoration, orb</li>
+      <li><strong>Cylinder</strong> &mdash; column, barrel, lamp post</li>
+      <li><strong>Capsule</strong> &mdash; character placeholder, vase shape</li>
+    </ul>
+    <div class="unity-note"><strong>Tip:</strong> Select an object and press <strong>F</strong> to focus the Scene camera on it. Hold right-click + WASD to fly around the Scene view.</div>
+  </div>
+
+  <div class="card">
+    <h3 style="color:var(--accent);margin-bottom:8px">Organise with Empty Parents</h3>
+    <p>Keep your Hierarchy tidy by grouping objects:</p>
+    <ol class="steps">
+      <li>Right-click in Hierarchy &rarr; <strong>Create Empty</strong></li>
+      <li>Rename it to <strong>Environment</strong></li>
+      <li>Drag all your walls and floor onto it (they become children)</li>
+      <li>Create another empty called <strong>Props</strong> for your objects</li>
+    </ol>
+  </div>
+
+  <div class="hierarchy">
+    <div class="hierarchy-title">Hierarchy</div>
+    <div class="h-item"><span class="icon">&#9660;</span> Environment</div>
+    <div class="h-item h-child">&#9642; Floor</div>
+    <div class="h-item h-child">&#9642; Wall_Back</div>
+    <div class="h-item h-child">&#9642; Wall_Front</div>
+    <div class="h-item h-child">&#9642; Wall_Left</div>
+    <div class="h-item h-child">&#9642; Wall_Right</div>
+    <div class="h-item"><span class="icon">&#9660;</span> Props</div>
+    <div class="h-item h-child">&#9642; Table</div>
+    <div class="h-item h-child">&#9642; Barrel</div>
+    <div class="h-item h-child">&#9642; Pedestal</div>
+    <div class="h-item h-child">&#9642; Column_1</div>
+    <div class="h-item h-child">&#9642; Column_2</div>
+  </div>
+
+  <div class="success-note"><strong>Checkpoint:</strong> You have a room with walls, a floor, and at least 5 objects. The Hierarchy is organised with parent groups.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══ STEP 3: PLAYER ══ -->
+<div class="lesson" id="s3">
+  <div class="lesson-head">
+    <span class="lesson-num">03</span>
+    <h2 class="lesson-title">Add the Player</h2>
+  </div>
+
+  <div class="card">
+    <p>In Three.js you had <code>OrbitControls</code> for camera movement. In Unity, we create a <strong>Player</strong> object with a camera attached and the <strong>PlayerController</strong> script for first-person controls.</p>
+  </div>
+
+  <div class="card">
+    <ol class="steps">
+      <li><strong>Delete</strong> the default <strong>Main Camera</strong> from the Hierarchy (right-click &rarr; Delete)</li>
+      <li>Right-click in Hierarchy &rarr; <strong>Create Empty</strong></li>
+      <li>Rename it to <strong>Player</strong></li>
+      <li>Set Position to <code>X: 0, Y: 0, Z: -10</code> (near the front wall, inside the room)</li>
+      <li>With Player selected, click the <strong>Tag</strong> dropdown (top of Inspector) &rarr; choose <strong>Player</strong></li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3 style="color:var(--accent);margin-bottom:8px">Add Components to Player</h3>
+    <ol class="steps">
+      <li>Click <strong>Add Component</strong> &rarr; search <strong>Character Controller</strong> &rarr; add it</li>
+      <li>Set Character Controller settings:
+        <ul>
+          <li><strong>Center</strong>: <code>X: 0, Y: 0.9, Z: 0</code></li>
+          <li><strong>Radius</strong>: <code>0.3</code></li>
+          <li><strong>Height</strong>: <code>1.8</code></li>
+        </ul>
+      </li>
+      <li>Click <strong>Add Component</strong> &rarr; search <strong>PlayerController</strong> &rarr; add it</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3 style="color:var(--accent);margin-bottom:8px">Add the Camera</h3>
+    <ol class="steps">
+      <li>Right-click on <strong>Player</strong> in the Hierarchy &rarr; <strong>Camera</strong></li>
+      <li>A Camera appears as a child of Player</li>
+      <li>Set the Camera's <strong>local Position</strong> to <code>X: 0, Y: 1.6, Z: 0</code> (eye height)</li>
+      <li>Make sure <strong>local Rotation</strong> is <code>0, 0, 0</code></li>
+      <li><strong>Important:</strong> Select the Camera, click the <strong>Tag</strong> dropdown at the top of the Inspector, and set it to <strong>MainCamera</strong>. Without this tag, the interaction scripts cannot detect where you are looking!</li>
+    </ol>
+  </div>
+
+  <div class="hierarchy">
+    <div class="hierarchy-title">Hierarchy</div>
+    <div class="h-item selected"><span class="icon">&#9660;</span> Player &nbsp;<span style="font-size:10px;color:#888">[Tag: Player]</span></div>
+    <div class="h-item h-child">&#127909; Camera &nbsp;<span style="font-size:10px;color:#888">[Tag: MainCamera]</span></div>
+    <div class="h-item"><span class="icon">&#9660;</span> Environment</div>
+    <div class="h-item h-child">&#9642; ...</div>
+  </div>
+
+  <div class="inspector">
+    <div class="insp-header"><span class="cb"></span> <span class="icon">&#128100;</span> Player Controller (Script)</div>
+    <div class="insp-body">
+      <div class="insp-row"><span class="insp-label">Move Speed</span><span class="insp-val">5</span></div>
+      <div class="insp-row"><span class="insp-label">Gravity</span><span class="insp-val">-9.81</span></div>
+      <div class="insp-row"><span class="insp-label">Mouse Sensitivity</span><span class="insp-val">2</span></div>
+      <div class="insp-row"><span class="insp-label">Max Look Angle</span><span class="insp-val">80</span></div>
+    </div>
+  </div>
+
+  <div class="warn-note"><strong>Common issue:</strong> If the player falls through the floor, make sure the floor Plane has a <strong>Mesh Collider</strong> (it should have one by default). Also check the Character Controller's Center Y is set correctly.</div>
+
+  <div class="success-note"><strong>Checkpoint:</strong> Press <strong>Play</strong>. You should be able to walk with WASD and look around with the mouse. Press Escape to free the cursor.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══ STEP 4: MATERIALS ══ -->
+<div class="lesson" id="s4">
+  <div class="lesson-head">
+    <span class="lesson-num">04</span>
+    <h2 class="lesson-title">Materials &amp; Colours</h2>
+  </div>
+
+  <div class="card">
+    <p>In Three.js you created materials with <code>new THREE.MeshPhysicalMaterial({ color: 0x8b5cf6, metalness: 0.3, roughness: 0.5 })</code>. In Unity, you create <strong>Material assets</strong> and drag them onto objects.</p>
+  </div>
+
+  <div class="card">
+    <h3 style="color:var(--accent);margin-bottom:8px">Create a Material</h3>
+    <ol class="steps">
+      <li>In the <strong>Project window</strong>, navigate to your <strong>Materials</strong> folder</li>
+      <li>Right-click &rarr; Create &rarr; <strong>Material</strong></li>
+      <li>Name it (e.g. <code>Floor_Material</code>)</li>
+      <li>Click the material to see its properties in the Inspector</li>
+      <li>Click the <strong>Albedo</strong> colour swatch to pick a colour</li>
+      <li>Adjust <strong>Metallic</strong> slider (0 = plastic, 1 = metal)</li>
+      <li>Adjust <strong>Smoothness</strong> slider (0 = rough, 1 = mirror-like)</li>
+      <li><strong>Drag</strong> the material from the Project window onto the object in the Scene view</li>
+    </ol>
+  </div>
+
+  <table class="compare">
+    <tr><th>Three.js Property</th><th>Unity Property</th><th>Values</th></tr>
+    <tr><td><code>color</code></td><td>Albedo</td><td>Colour picker</td></tr>
+    <tr><td><code>metalness</code></td><td>Metallic</td><td>0 to 1 slider</td></tr>
+    <tr><td><code>roughness</code></td><td>Smoothness (inverse!)</td><td>0 = rough, 1 = smooth</td></tr>
+    <tr><td><code>emissive</code></td><td>Emission (tick checkbox)</td><td>Colour + intensity</td></tr>
+  </table>
+
+  <div class="analogy"><strong>Key difference:</strong> Three.js uses <code>roughness</code> (high = rough). Unity uses <code>Smoothness</code> (high = smooth). They're <strong>inverses</strong> &mdash; a roughness of 0.3 in Three.js is a Smoothness of 0.7 in Unity.</div>
+
+  <div class="card">
+    <h3 style="color:var(--accent);margin-bottom:8px">Create Multiple Materials</h3>
+    <p>Create at least <strong>4 different materials</strong> for variety:</p>
+    <ul>
+      <li><strong>Floor</strong> &mdash; dark colour, low smoothness (concrete/wood look)</li>
+      <li><strong>Walls</strong> &mdash; neutral colour, low smoothness</li>
+      <li><strong>Metal</strong> &mdash; grey, high metallic, medium smoothness</li>
+      <li><strong>Accent</strong> &mdash; a bright colour for key objects (doors, pickups)</li>
+    </ul>
+    <div class="unity-note"><strong>Tip:</strong> You can drag a material onto multiple objects. One material can be shared by many objects, just like in Three.js.</div>
+  </div>
+
+  <div class="success-note"><strong>Checkpoint:</strong> Your scene has coloured objects. No more default grey. At least 4 different materials applied.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══ STEP 5: LIGHTING ══ -->
+<div class="lesson" id="s5">
+  <div class="lesson-head">
+    <span class="lesson-num">05</span>
+    <h2 class="lesson-title">Lighting &amp; Atmosphere</h2>
+  </div>
+
+  <div class="card">
+    <p>In Three.js you added lights with <code>new THREE.DirectionalLight()</code> and <code>new THREE.PointLight()</code>. Unity works the same way &mdash; but you create light objects in the scene instead of writing code.</p>
+  </div>
+
+  <div class="card">
+    <h3 style="color:var(--accent);margin-bottom:8px">Set Up Your Lights</h3>
+    <p>Your scene already has a <strong>Directional Light</strong> (Unity creates one by default). Let's configure it and add more:</p>
+    <ol class="steps">
+      <li>Select the existing <strong>Directional Light</strong> in the Hierarchy</li>
+      <li>Set its <strong>Rotation</strong> to <code>X: 50, Y: -30, Z: 0</code> (angle of the sun)</li>
+      <li>Set <strong>Intensity</strong> to <code>1</code></li>
+      <li>Tick <strong>Shadow Type &rarr; Soft Shadows</strong></li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3 style="color:var(--accent);margin-bottom:8px">Add Point Lights</h3>
+    <p>Point lights are like <code>new THREE.PointLight()</code> &mdash; they emit light in all directions from a point.</p>
+    <ol class="steps">
+      <li>Right-click in Hierarchy &rarr; Light &rarr; <strong>Point Light</strong></li>
+      <li>Rename it (e.g. <code>RoomLight_1</code>)</li>
+      <li>Position it where you want a light source (above a table, in a corner)</li>
+      <li>Set <strong>Range</strong> (how far the light reaches)</li>
+      <li>Set <strong>Intensity</strong> and <strong>Color</strong></li>
+      <li>Add 2-3 point lights around your scene for atmosphere</li>
+    </ol>
+  </div>
+
+  <table class="compare">
+    <tr><th>Three.js</th><th>Unity</th><th>Notes</th></tr>
+    <tr><td><code>DirectionalLight(0xffffff, 1.0)</code></td><td>Directional Light, Intensity: 1</td><td>Sun/moon &mdash; parallel rays</td></tr>
+    <tr><td><code>PointLight(0xffa500, 1, 10)</code></td><td>Point Light, Range: 10</td><td>Bulb &mdash; light in all directions</td></tr>
+    <tr><td><code>SpotLight()</code></td><td>Spot Light</td><td>Flashlight / stage light</td></tr>
+    <tr><td><code>AmbientLight(0xffffff, 0.3)</code></td><td>Window &rarr; Lighting &rarr; Environment</td><td>Global fill light</td></tr>
+  </table>
+
+  <div class="card">
+    <h3 style="color:var(--accent);margin-bottom:8px">Set the Background Colour</h3>
+    <p>In Three.js: <code>scene.background = new THREE.Color(0x1a1a2e)</code>. In Unity:</p>
+    <ol class="steps">
+      <li>Select the <strong>Camera</strong> (child of Player)</li>
+      <li>In the Inspector, find <strong>Clear Flags</strong> &rarr; set to <strong>Solid Color</strong></li>
+      <li>Click the <strong>Background</strong> colour to pick your sky colour</li>
+    </ol>
+    <div class="unity-note"><strong>Alternative:</strong> Use Window &rarr; Rendering &rarr; Lighting &rarr; Environment tab to set a Skybox material for a sky image instead of a flat colour.</div>
+  </div>
+
+  <div class="success-note"><strong>Checkpoint:</strong> Your scene has mood. At least one directional light with shadows and 2-3 point lights. The background isn't default blue.</div>
+</div>
+
+<div class="divider"></div>
+
+</div><!-- /wrap -->
+
+<!-- ══ PART: INTERACTIONS ══ -->
+<div class="part-div"><div class="part-inner">
+  <div class="part-label">Core Feature</div>
+  <div class="part-title">Making It Interactive</div>
+  <p class="part-desc">This is where Unity shines over Three.js. Adding interactions without writing code.</p>
+</div></div>
+
+<div class="wrap">
+
+<!-- ══ STEP 6: INTERACTIONS ══ -->
+<div class="lesson" id="s6">
+  <div class="lesson-head">
+    <span class="lesson-num">06</span>
+    <h2 class="lesson-title">Add Interactions</h2>
+  </div>
+
+  <div class="card">
+    <p>You need <strong>at least 3 different interaction types</strong> for your assignment. Here's how to set up each one using the scripts we imported. No coding &mdash; just drag and drop in the Inspector.</p>
+  </div>
+
+  <!-- DOOR -->
+  <div class="card">
+    <h3 style="color:var(--accent3);margin-bottom:8px">Interaction 1: Door</h3>
+    <p>A door that opens and closes when the player presses E.</p>
+    <ol class="steps">
+      <li>Create a <strong>Cube</strong> for the door (Scale: <code>1, 2, 0.1</code>)</li>
+      <li>Create an <strong>Empty GameObject</strong> &mdash; rename it <strong>DoorPivot</strong></li>
+      <li>Position DoorPivot at the <strong>hinge edge</strong> of the door</li>
+      <li>Make the door Cube a <strong>child</strong> of DoorPivot</li>
+      <li>Offset the door's <strong>local X position</strong> by half its width (e.g. <code>0.5</code>) so the edge sits at the pivot</li>
+      <li>Select <strong>DoorPivot</strong> and add these components:
+        <ul>
+          <li><strong>Box Collider</strong> (adjust size to cover the door)</li>
+          <li><strong>Interactable</strong> &mdash; set Prompt Text: <code>Press E to open</code></li>
+          <li><strong>Door</strong></li>
+        </ul>
+      </li>
+      <li>In the <strong>On Interact</strong> event: click +, drag <strong>DoorPivot</strong> into the object slot, select <strong>Door &rarr; ToggleDoor</strong></li>
+    </ol>
+  </div>
+
+  <div class="inspector">
+    <div class="insp-header"><span class="cb"></span> Interactable (Script)</div>
+    <div class="insp-body">
+      <div class="insp-row"><span class="insp-label">Interact Distance</span><span class="insp-val">3</span></div>
+      <div class="insp-row"><span class="insp-label">Prompt Text</span><span class="insp-val">Press E to open</span></div>
+      <div class="insp-event">
+        <div class="insp-event-head">On Interact ()</div>
+        <div class="insp-event-row">
+          <span class="insp-event-obj">DoorPivot (Door)</span>
+          <span class="insp-event-fn">Door.ToggleDoor</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hierarchy">
+    <div class="hierarchy-title">Door Hierarchy</div>
+    <div class="h-item"><span class="icon">&#9660;</span> DoorPivot &nbsp;<span style="font-size:10px;color:#888">[Interactable + Door + BoxCollider]</span></div>
+    <div class="h-item h-child">&#9642; DoorMesh &nbsp;<span style="font-size:10px;color:#888">[Cube, local X: 0.5]</span></div>
+  </div>
+
+  <!-- PICKUP -->
+  <div class="card" style="margin-top:24px">
+    <h3 style="color:var(--accent2);margin-bottom:8px">Interaction 2: Pickup</h3>
+    <p>A floating, spinning gem that disappears when collected.</p>
+    <ol class="steps">
+      <li>Create a <strong>Sphere</strong> (or any shape for your collectible)</li>
+      <li>Scale it down: <code>0.3, 0.3, 0.3</code></li>
+      <li>Apply a bright <strong>material</strong> (gold, green, etc.)</li>
+      <li>Position it floating above a surface (e.g. Y: 1.5)</li>
+      <li>Add components:
+        <ul>
+          <li><strong>Sphere Collider</strong> (should auto-add)</li>
+          <li><strong>Interactable</strong> &mdash; Prompt: <code>Press E to collect</code></li>
+          <li><strong>Pickup</strong></li>
+        </ul>
+      </li>
+      <li>In <strong>On Interact</strong>: drag this object, select <strong>Pickup &rarr; Collect</strong></li>
+      <li>Duplicate (Ctrl+D) and scatter copies around your scene</li>
+    </ol>
+  </div>
+
+  <div class="inspector">
+    <div class="insp-header"><span class="cb"></span> Pickup (Script)</div>
+    <div class="insp-body">
+      <div class="insp-row"><span class="insp-label">Score Value</span><span class="insp-val">1</span></div>
+      <div class="insp-row"><span class="insp-label">Bob Up Down</span><span class="insp-val">&#10003;</span></div>
+      <div class="insp-row"><span class="insp-label">Spin</span><span class="insp-val">&#10003;</span></div>
+      <div class="insp-row"><span class="insp-label">Bob Speed</span><span class="insp-val">2</span></div>
+      <div class="insp-row"><span class="insp-label">Bob Height</span><span class="insp-val">0.25</span></div>
+      <div class="insp-row"><span class="insp-label">Spin Speed</span><span class="insp-val">90</span></div>
+      <div class="insp-row"><span class="insp-label">Pickup Sound</span><span class="insp-slot">None (Audio Clip)</span></div>
+    </div>
+  </div>
+
+  <!-- LIGHT SWITCH -->
+  <div class="card" style="margin-top:24px">
+    <h3 style="color:var(--accent4);margin-bottom:8px">Interaction 3: Light Switch</h3>
+    <p>A switch on the wall that toggles a nearby light.</p>
+    <ol class="steps">
+      <li>Create a small <strong>Cube</strong> on a wall (Scale: <code>0.2, 0.3, 0.05</code>) &mdash; this is the switch</li>
+      <li>Make sure there's a <strong>Point Light</strong> nearby that this switch will control</li>
+      <li>Add components to the switch:
+        <ul>
+          <li><strong>Box Collider</strong></li>
+          <li><strong>Interactable</strong> &mdash; Prompt: <code>Press E to toggle light</code></li>
+          <li><strong>LightSwitch</strong></li>
+        </ul>
+      </li>
+      <li><strong>Drag the Point Light</strong> from the Hierarchy into the <strong>Target Light</strong> slot</li>
+      <li>In <strong>On Interact</strong>: drag the switch object, select <strong>LightSwitch &rarr; ToggleLight</strong></li>
+    </ol>
+  </div>
+
+  <div class="inspector">
+    <div class="insp-header"><span class="cb"></span> Light Switch (Script)</div>
+    <div class="insp-body">
+      <div class="insp-row"><span class="insp-label">Target Light</span><span class="insp-slot filled">RoomLight (Light)</span></div>
+      <div class="insp-row"><span class="insp-label">Emissive Renderer</span><span class="insp-slot">None (Renderer)</span></div>
+      <div class="insp-row"><span class="insp-label">Emissive Color</span><span class="insp-val" style="background:#eab308;color:#000;">Yellow</span></div>
+      <div class="insp-row"><span class="insp-label">Emissive Intensity</span><span class="insp-val">2</span></div>
+    </div>
+  </div>
+
+  <!-- TRIGGER ZONE (BONUS) -->
+  <div class="card" style="margin-top:24px">
+    <h3 style="color:#c084fc;margin-bottom:8px">Bonus: Trigger Zone</h3>
+    <p>An invisible area that fires events when the player walks through &mdash; no button press needed.</p>
+    <ol class="steps">
+      <li>Create an <strong>Empty GameObject</strong> &mdash; rename it (e.g. <code>EntryTrigger</code>)</li>
+      <li>Add a <strong>Box Collider</strong></li>
+      <li>Tick <strong>Is Trigger</strong> on the Box Collider</li>
+      <li>Resize the collider to cover a doorway or area (Edit Collider button or Size fields)</li>
+      <li>Add the <strong>TriggerZone</strong> script</li>
+      <li>In <strong>On Player Enter</strong>: click +, drag a Light, select <strong>Light &rarr; enabled</strong> &rarr; tick the checkbox</li>
+    </ol>
+    <div class="warn-note"><strong>Remember:</strong> Your Player must have the <strong>"Player" tag</strong> set, or triggers won't detect it.</div>
+  </div>
+
+  <div class="success-note"><strong>Checkpoint:</strong> You have at least 3 working interactions. Test each one in Play mode.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══ STEP 7: POLISH ══ -->
+<div class="lesson" id="s7">
+  <div class="lesson-head">
+    <span class="lesson-num">07</span>
+    <h2 class="lesson-title">Polish &amp; Import Models</h2>
+  </div>
+
+  <div class="card">
+    <p>Replace prototype cubes with real 3D models. In Three.js you used <code>GLTFLoader</code> &mdash; in Unity, you just <strong>drag and drop</strong>.</p>
+  </div>
+
+  <div class="card">
+    <h3 style="color:var(--accent);margin-bottom:8px">Import GLB/FBX Models</h3>
+    <ol class="steps">
+      <li><strong>Drag</strong> your .glb, .fbx, or .obj file into the <strong>Assets/Models</strong> folder in the Project window</li>
+      <li>Unity imports it automatically</li>
+      <li>Click the imported model &rarr; Inspector &rarr; <strong>Materials</strong> tab &rarr; click <strong>Extract Textures</strong> and <strong>Extract Materials</strong> to get editable materials</li>
+      <li>Drag the model from the Project window into the Scene</li>
+      <li>Position and scale it to fit your scene</li>
+    </ol>
+    <div class="analogy">In Three.js: <code>loader.load('model.glb', (gltf) =&gt; scene.add(gltf.scene))</code>. In Unity: just drag it in. Same result.</div>
+  </div>
+
+  <div class="card">
+    <h3 style="color:var(--accent);margin-bottom:8px">Free Asset Sources</h3>
+    <ul>
+      <li><strong>Your own Blender models</strong> from earlier weeks (export as GLB or FBX)</li>
+      <li><strong>Sketchfab</strong> &mdash; filter by "Downloadable" and CC licence</li>
+      <li><strong>Unity Asset Store</strong> &mdash; many free packs available</li>
+      <li><strong>Poly Pizza</strong> &mdash; free low-poly models</li>
+      <li><strong>Kenney.nl</strong> &mdash; free game assets (CC0)</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3 style="color:var(--accent);margin-bottom:8px">Add Sound Effects</h3>
+    <ol class="steps">
+      <li>Drag .wav or .mp3 files into your <strong>Assets/Audio</strong> folder</li>
+      <li>For pickup sounds: drag the audio clip into the Pickup script's <strong>Pickup Sound</strong> slot</li>
+      <li>For ambient sounds: add an <strong>Audio Source</strong> component to any object, assign the clip, tick <strong>Loop</strong> and <strong>Play On Awake</strong></li>
+    </ol>
+  </div>
+
+  <div class="success-note"><strong>Checkpoint:</strong> Your scene looks polished with imported models and/or textured primitives. Optionally has sound.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══ STEP 8: BUILD ══ -->
+<div class="lesson" id="s8">
+  <div class="lesson-head">
+    <span class="lesson-num">08</span>
+    <h2 class="lesson-title">Build &amp; Export</h2>
+  </div>
+
+  <div class="card">
+    <p>Time to create a standalone application that anyone can run &mdash; no Unity required.</p>
+  </div>
+
+  <div class="card">
+    <h3 style="color:var(--accent);margin-bottom:8px">Build Steps</h3>
+    <ol class="steps">
+      <li>Go to <strong>File &rarr; Build Settings</strong></li>
+      <li>Click <strong>Add Open Scenes</strong> to include your current scene</li>
+      <li>Select <strong>Windows, Mac, Linux</strong> as the platform (or WebGL)</li>
+      <li>Click <strong>Player Settings</strong> &rarr; set your <strong>Product Name</strong></li>
+      <li>Click <strong>Build</strong></li>
+      <li>Choose a folder for the output (create a new folder called <strong>Build</strong>)</li>
+      <li>Wait for Unity to build your application</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3 style="color:var(--accent);margin-bottom:8px">Test Your Build</h3>
+    <ol class="steps">
+      <li>Navigate to the Build folder</li>
+      <li>Run the <strong>.exe</strong> file</li>
+      <li>Test all interactions work</li>
+      <li>Check for any errors or missing textures</li>
+      <li><strong>Zip</strong> the entire Build folder for submission</li>
+    </ol>
+    <div class="warn-note"><strong>Important:</strong> When zipping for submission, include ALL files in the Build folder. The .exe alone won't work &mdash; it needs the Data folder next to it.</div>
+  </div>
+
+  <div class="card">
+    <h3 style="color:var(--accent);margin-bottom:8px">Submission Files</h3>
+    <ul>
+      <li><code>Lastname_Firstname_W9_Build.zip</code> &mdash; the built application</li>
+      <li><code>Lastname_Firstname_W9_Screenshot.png</code> &mdash; screenshot of your scene</li>
+      <li><code>Lastname_Firstname_W9_Demo.mp4</code> &mdash; screen recording (60-90 seconds)</li>
+      <li><code>Lastname_Firstname_W9_Project.zip</code> &mdash; your Unity project folder</li>
+    </ul>
+  </div>
+
+  <div class="success-note"><strong>Checkpoint:</strong> Your build runs outside of Unity. All interactions work. You have your submission files ready.</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══ CHECKLIST ══ -->
+<div class="lesson" id="checklist">
+  <div class="lesson-head">
+    <span class="lesson-num">&#10003;</span>
+    <h2 class="lesson-title">Final Checklist</h2>
+  </div>
+
+  <div class="card">
+    <h3 style="color:var(--accent);margin-bottom:12px">Before You Submit</h3>
+    <ul class="checklist">
+      <li>Player has CharacterController + PlayerController + child Camera</li>
+      <li>Player's Camera is tagged <strong>"MainCamera"</strong> (required for interactions)</li>
+      <li>Player is tagged <strong>"Player"</strong> (required for trigger zones)</li>
+      <li>Environment has walls, floor, and at least <strong>5 distinct objects</strong></li>
+      <li>At least <strong>4 different materials</strong> applied</li>
+      <li>Lighting creates atmosphere (directional light + 2-3 point lights)</li>
+      <li>Background colour or skybox is set (not default blue)</li>
+      <li>At least <strong>3 different interaction types</strong> working</li>
+      <li>All On Interact events are wired up correctly</li>
+      <li>All trigger zones have <strong>Is Trigger</strong> ticked</li>
+      <li>No errors in the Console</li>
+      <li>Build runs without Unity installed</li>
+      <li>Screen recording shows all interactions</li>
+      <li>Files are named correctly</li>
+    </ul>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══ THREE.JS COMPARISON ══ -->
+<div class="lesson" id="comparison">
+  <div class="lesson-head">
+    <span class="lesson-num">&#8596;</span>
+    <h2 class="lesson-title">Three.js &harr; Unity Comparison</h2>
+  </div>
+
+  <div class="card">
+    <p>A side-by-side look at how the same concepts work in both environments. Use this as a quick reference.</p>
+  </div>
+
+  <div class="two">
+    <div class="card">
+      <h3 style="color:var(--accent2);margin-bottom:8px">Three.js (Code)</h3>
+<pre><code><span class="cm">// Create a red box</span>
+<span class="kw">const</span> box = <span class="kw">new</span> THREE.Mesh(
+  <span class="kw">new</span> THREE.BoxGeometry(<span class="nm">1</span>,<span class="nm">1</span>,<span class="nm">1</span>),
+  <span class="kw">new</span> THREE.MeshPhysicalMaterial({
+    color: <span class="nm">0xff0000</span>,
+    metalness: <span class="nm">0.5</span>,
+    roughness: <span class="nm">0.3</span>
+  })
+);
+box.position.set(<span class="nm">0</span>, <span class="nm">0.5</span>, <span class="nm">0</span>);
+scene.add(box);
+
+<span class="cm">// Add a point light</span>
+<span class="kw">const</span> light = <span class="kw">new</span> THREE.PointLight(
+  <span class="nm">0xffa500</span>, <span class="nm">1</span>, <span class="nm">10</span>
+);
+light.position.set(<span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">0</span>);
+scene.add(light);
+
+<span class="cm">// Load a GLB model</span>
+<span class="kw">const</span> loader = <span class="kw">new</span> GLTFLoader();
+loader.load(<span class="st">'model.glb'</span>, (gltf) => {
+  scene.add(gltf.scene);
+});</code></pre>
+    </div>
+    <div class="card">
+      <h3 style="color:var(--accent);margin-bottom:8px">Unity (Inspector)</h3>
+<pre><code><span class="cm">// Create a red box</span>
+Hierarchy &rarr; 3D Object &rarr; Cube
+  Position: 0, 0.5, 0
+  Material: Red
+    Albedo: #FF0000
+    Metallic: 0.5
+    Smoothness: 0.7
+
+<span class="cm">// Add a point light</span>
+Hierarchy &rarr; Light &rarr; Point Light
+  Position: 2, 3, 0
+  Color: Orange
+  Intensity: 1
+  Range: 10
+
+<span class="cm">// Load a 3D model</span>
+Drag model.glb into Assets folder
+Drag from Project into Scene</code></pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="color:var(--accent);margin-bottom:8px">Key Differences</h3>
+    <table class="compare">
+      <tr><th>Aspect</th><th>Three.js</th><th>Unity</th></tr>
+      <tr><td>Workflow</td><td>Write code, refresh browser</td><td>Drag and drop, press Play</td></tr>
+      <tr><td>Animation loop</td><td>You write <code>requestAnimationFrame</code></td><td>Automatic (Update runs every frame)</td></tr>
+      <tr><td>Physics</td><td>Manual or add a library</td><td>Built-in (Rigidbody + Colliders)</td></tr>
+      <tr><td>Interactions</td><td>Code raycasting manually</td><td>Script + Inspector events</td></tr>
+      <tr><td>Output</td><td>HTML file (runs in browser)</td><td>.exe / WebGL build</td></tr>
+      <tr><td>Performance</td><td>Limited by browser</td><td>Native performance, GPU access</td></tr>
+      <tr><td>File size</td><td>Single HTML (small)</td><td>Build folder (larger)</td></tr>
+    </table>
+  </div>
+
+  <div class="analogy">Both tools create 3D interactive experiences. Three.js lives in the browser and uses code. Unity is a full engine with a visual editor. The 3D concepts &mdash; meshes, materials, lights, cameras, transforms &mdash; are identical. Once you understand one, you understand both.</div>
+</div>
+
+</div><!-- /wrap -->
+
+<!-- Navigation -->
+<div style="max-width:1100px;margin:0 auto;padding:0 24px">
+  <div class="nav" style="padding:0 0 20px">
+    <a href="../index.html">&larr; Week 9 Overview</a>
+    <a href="script-setup-guide.html">Script Setup Guide</a>
+    <a href="../assignment.html">Assignment 9</a>
+  </div>
+</div>
+
+<footer>
+  <img src="../../CCT_Logo.png" alt="CCT University of Galway" style="height:50px;opacity:0.6;margin-bottom:12px;display:block;margin-left:auto;margin-right:auto"><br>
+  Week 9 &middot; Unity Journey &middot; Immersive Environments
+</footer>
+</body>
+</html>

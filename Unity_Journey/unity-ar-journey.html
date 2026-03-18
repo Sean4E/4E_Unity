@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unity AR Journey - Build AR in Unity</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07080f;--surface:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--accent:#f97316;--accent2:#22d3ee;--accent3:#a78bfa;--accent4:#34d399;--text:#e8eaf0;--dim:#7a7f96;--code-bg:rgba(0,0,0,0.5);--mono:'Space Mono',monospace;--display:'Syne',sans-serif}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--display);line-height:1.7}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(249,115,22,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(249,115,22,0.02) 1px,transparent 1px);background-size:60px 60px}
+.hero{position:relative;padding:70px 40px 30px;text-align:center;z-index:1}
+.hero-badge{display:inline-block;background:rgba(249,115,22,0.15);border:1px solid rgba(249,115,22,0.3);color:var(--accent);font-family:var(--mono);font-size:11px;letter-spacing:3px;text-transform:uppercase;padding:6px 18px;border-radius:100px;margin-bottom:24px}
+.hero h1{font-size:clamp(34px,6vw,68px);font-weight:800;line-height:1.05;letter-spacing:-2px;margin-bottom:16px}
+.hero h1 .orange{color:var(--accent)}
+.hero p{font-size:16px;color:var(--dim);max-width:620px;margin:0 auto 12px;line-height:1.8}
+.hero-sub{font-family:var(--mono);font-size:11px;color:#3f4460;letter-spacing:1px}
+.nav{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:0 40px 40px;z-index:1;position:relative}
+.nav a{background:var(--surface);border:1px solid var(--border);color:var(--dim);font-family:var(--mono);font-size:10px;padding:6px 14px;border-radius:100px;text-decoration:none;transition:all 0.2s;letter-spacing:0.5px}
+.nav a:hover,.nav a.active{background:rgba(249,115,22,0.15);border-color:rgba(249,115,22,0.4);color:var(--accent)}
+.nav-div{width:100%;text-align:center;font-family:var(--mono);font-size:10px;color:#2a2d3a;letter-spacing:2px;padding:4px 0}
+.wrap{max-width:1100px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+.lesson{margin-bottom:50px}
+.lesson-head{display:flex;align-items:flex-start;gap:16px;margin-bottom:20px}
+.lesson-num{font-family:var(--mono);font-size:12px;color:var(--accent);background:rgba(249,115,22,0.12);border:1px solid rgba(249,115,22,0.25);padding:4px 10px;border-radius:6px;white-space:nowrap;margin-top:5px}
+.lesson-title{font-size:clamp(20px,3vw,30px);font-weight:800;letter-spacing:-1px;line-height:1.1}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px 26px;margin-bottom:16px;backdrop-filter:blur(8px)}
+.card p{font-size:15px;color:#c5cad8;line-height:1.85}
+.card strong{color:var(--accent);font-weight:700}
+.card .cyan{color:var(--accent2)}
+.card .purple{color:var(--accent3)}
+.card .green{color:var(--accent4)}
+.analogy{background:rgba(167,139,250,0.06);border-left:3px solid var(--accent3);padding:12px 18px;border-radius:0 10px 10px 0;margin:12px 0;font-size:14px;color:#b8a5e8;font-style:italic}
+.unity-note{background:rgba(249,115,22,0.06);border-left:3px solid var(--accent);padding:10px 16px;border-radius:0 10px 10px 0;margin:12px 0 0;font-size:13px;color:#e8a87d;font-style:italic}
+.warn-note{background:rgba(255,60,60,0.06);border-left:3px solid #ff6b6b;padding:10px 16px;border-radius:0 10px 10px 0;margin:12px 0 0;font-size:13px;color:#e88a7d;font-style:italic}
+.success-note{background:rgba(52,211,153,0.06);border-left:3px solid var(--accent4);padding:10px 16px;border-radius:0 10px 10px 0;margin:12px 0 0;font-size:13px;color:#7de8b8;font-style:italic}
+.code-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.code-label{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:1px;text-transform:uppercase}
+.cbtn{background:var(--surface);border:1px solid var(--border);color:var(--dim);font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:5px;cursor:pointer;transition:all 0.2s}
+.cbtn:hover{color:var(--accent);border-color:rgba(249,115,22,0.3)}
+.cbtn.ok{border-color:#4ade80;color:#4ade80;background:rgba(74,222,128,0.1)}
+pre{background:var(--code-bg);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:18px 20px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.85;color:var(--text);margin-bottom:16px;white-space:pre}
+code{font-family:inherit}
+.kw{color:#c792ea}.st{color:#c3e88d}.nm{color:#f78c6c}.cm{color:#546e7a;font-style:italic}.ty{color:#22d3ee}.fn{color:#34d399}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.two>div{min-width:0}
+@media(max-width:850px){.two{grid-template-columns:1fr}.hero{padding:50px 20px 20px}.nav{padding:0 16px 24px}.wrap{padding:0 14px}pre{font-size:11px;padding:14px}.element-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))!important}}
+.ctrl{margin-top:8px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px}
+.ctrl label{color:var(--dim);font-size:11px;font-family:var(--mono);white-space:nowrap}
+.ctrl input[type="range"]{width:70px;accent-color:var(--accent)}
+.ctrl input[type="color"]{width:26px;height:22px;border:1px solid var(--border);border-radius:4px;padding:0;cursor:pointer;background:none}
+.ctrl select{background:var(--code-bg);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:3px 6px;font-size:11px;font-family:var(--mono)}
+.ctrl .vv{color:var(--dim);font-family:var(--mono);font-size:11px;min-width:28px}
+.btn{padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--dim);font-size:11px;font-family:var(--mono);cursor:pointer;transition:all 0.15s}
+.btn:hover{border-color:var(--accent);color:var(--text)}
+.btn.primary{background:var(--accent);color:#07080f;border-color:var(--accent);font-weight:700}
+.shape-btn{padding:4px 8px;border-radius:5px;border:1px solid var(--border);background:var(--surface);color:var(--dim);font-size:10px;font-family:var(--mono);cursor:pointer;transition:all 0.15s}
+.shape-btn:hover,.shape-btn.active{border-color:var(--accent);color:var(--text);background:rgba(249,115,22,0.12)}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:40px 0}
+.part-div{max-width:1100px;margin:30px auto 20px;padding:0 24px}
+.part-inner{border:1px solid var(--border);border-radius:12px;padding:20px 24px;text-align:center;background:linear-gradient(135deg,rgba(249,115,22,0.06),transparent)}
+.part-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:3px;color:var(--accent);margin-bottom:4px}
+.part-title{font-size:22px;font-weight:800;margin-bottom:4px}
+.part-desc{color:var(--dim);font-size:14px}
+footer{text-align:center;padding:36px 24px;color:var(--dim);font-family:var(--mono);font-size:11px;border-top:1px solid var(--border);margin-top:50px;position:relative;z-index:1}
+
+/* -- Demo Boxes -- */
+.demo-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:16px;position:relative;overflow:hidden}
+.demo-label{position:absolute;top:8px;right:10px;font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;z-index:2}
+.mock-viewport{background:#3c3c3c;border-radius:8px;min-height:200px;display:flex;align-items:center;justify-content:center;position:relative;border:1px solid #555}
+.mock-viewport-label{position:absolute;top:6px;left:10px;font-size:9px;color:rgba(255,255,255,0.25);font-family:var(--mono)}
+.state-indicator{font-family:var(--mono);font-size:11px;color:var(--accent);margin-top:8px;text-align:center}
+
+/* -- Inspector Mockup -- */
+.inspector{background:#1e2129;border:1px solid #3a3f52;border-radius:8px;overflow:hidden;font-family:var(--display);margin:12px 0}
+.inspector-header{background:#282c36;padding:7px 12px;font-size:11px;font-weight:700;color:#e8eaf0;display:flex;align-items:center;gap:6px;border-bottom:1px solid #3a3f52}
+.inspector-header .arrow{color:var(--accent);font-size:10px}
+.inspector-row{display:flex;align-items:center;padding:4px 12px;border-bottom:1px solid rgba(255,255,255,0.03);font-size:11px}
+.inspector-label{color:#8890aa;width:120px;flex-shrink:0;font-family:var(--mono);font-size:10px}
+.inspector-val{color:#c9d1e0;flex:1;font-family:var(--mono);font-size:11px}
+.inspector-val .fake-input{background:#282c36;border:1px solid #3a3f52;border-radius:3px;color:#c9d1e0;padding:2px 8px;font-size:10px;font-family:var(--mono);width:60px}
+.inspector-val .highlight{color:var(--accent);font-weight:700}
+
+/* -- Hierarchy Mockup -- */
+.hierarchy{background:#1e2129;border:1px solid #3a3f52;border-radius:8px;overflow:hidden;margin:12px 0}
+.hierarchy-title{background:#282c36;padding:7px 12px;font-size:11px;font-weight:700;color:#e8eaf0;border-bottom:1px solid #3a3f52;display:flex;align-items:center;gap:6px}
+.hierarchy-item{display:flex;align-items:center;gap:6px;padding:3px 8px;font-size:11px;color:#a0a8c0;font-family:var(--mono)}
+.hierarchy-item.selected{background:rgba(249,115,22,0.1);color:var(--accent)}
+.hierarchy-item .indent{display:inline-block}
+
+/* -- Comparison Table -- */
+.compare-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px}
+.compare-table th{background:rgba(249,115,22,0.1);color:var(--accent);font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:8px 12px;text-align:left;border-bottom:2px solid rgba(249,115,22,0.2)}
+.compare-table td{padding:6px 12px;border-bottom:1px solid var(--border);color:#c5cad8;font-family:var(--mono);font-size:11px}
+.compare-table tr:hover td{background:rgba(255,255,255,0.02)}
+
+/* -- Phone Frame -- */
+.phone-frame{width:220px;margin:0 auto;background:linear-gradient(180deg,#4a4a5a,#3a3a4a);border-radius:24px;padding:8px;box-shadow:0 8px 32px rgba(0,0,0,0.4);position:relative}
+.phone-screen{background:linear-gradient(170deg,#5a5a6a 0%,#3c3c4c 40%,#2a2a3a 100%);border-radius:18px;min-height:340px;overflow:hidden;position:relative}
+.phone-notch{width:80px;height:6px;background:#2a2a3a;border-radius:0 0 8px 8px;margin:0 auto;position:relative;z-index:5}
+.phone-cam-label{position:absolute;top:10px;left:10px;font-family:var(--mono);font-size:8px;color:rgba(255,255,255,0.2);letter-spacing:1px;z-index:5}
+
+/* -- AR Plane Grid -- */
+.ar-plane{position:absolute;bottom:40px;left:50%;transform:translateX(-50%) perspective(400px) rotateX(55deg);width:180px;height:120px;border:1px solid rgba(249,115,22,0.3);background:repeating-linear-gradient(0deg,transparent,transparent 19px,rgba(249,115,22,0.12) 19px,rgba(249,115,22,0.12) 20px),repeating-linear-gradient(90deg,transparent,transparent 19px,rgba(249,115,22,0.12) 19px,rgba(249,115,22,0.12) 20px);border-radius:4px;transition:opacity 0.3s}
+.ar-plane.vertical{transform:translateX(-50%) translateY(-20px) perspective(400px) rotateX(10deg) rotateY(25deg);bottom:60px;width:140px;height:100px;border-color:rgba(34,211,238,0.3);background:repeating-linear-gradient(0deg,transparent,transparent 19px,rgba(34,211,238,0.12) 19px,rgba(34,211,238,0.12) 20px),repeating-linear-gradient(90deg,transparent,transparent 19px,rgba(34,211,238,0.12) 19px,rgba(34,211,238,0.12) 20px)}
+
+/* -- AR Object -- */
+.ar-object{width:30px;height:30px;position:absolute;transition:all 0.3s ease;z-index:4}
+.ar-cube{background:var(--accent);border:2px solid rgba(255,255,255,0.3);box-shadow:0 4px 12px rgba(249,115,22,0.4)}
+.ar-sphere{background:var(--accent2);border:2px solid rgba(255,255,255,0.3);border-radius:50%;box-shadow:0 4px 12px rgba(34,211,238,0.4)}
+.ar-cylinder{background:var(--accent4);border:2px solid rgba(255,255,255,0.3);border-radius:4px 4px 50% 50%;box-shadow:0 4px 12px rgba(52,211,153,0.4)}
+
+/* -- Touch Demo -- */
+.touch-area{width:100%;height:200px;background:#1e2129;border:1px solid #3a3f52;border-radius:8px;position:relative;overflow:hidden;cursor:crosshair;touch-action:none}
+.touch-dot{width:16px;height:16px;border-radius:50%;background:var(--accent);position:absolute;pointer-events:none;transform:translate(-50%,-50%);box-shadow:0 0 12px rgba(249,115,22,0.5);transition:opacity 0.1s}
+.touch-trail{width:6px;height:6px;border-radius:50%;background:rgba(249,115,22,0.3);position:absolute;pointer-events:none;transform:translate(-50%,-50%)}
+
+/* -- Flow Chart -- */
+.flow-chart{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;padding:16px;font-family:var(--mono);font-size:11px}
+.flow-node{padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);text-align:center;min-width:80px}
+.flow-node.start{border-color:var(--accent);background:rgba(249,115,22,0.1);color:var(--accent)}
+.flow-node.yes{border-color:var(--accent4);background:rgba(52,211,153,0.1);color:var(--accent4)}
+.flow-node.no{border-color:var(--accent3);background:rgba(167,139,250,0.1);color:var(--accent3)}
+.flow-node.action{border-color:var(--accent2);background:rgba(34,211,238,0.1);color:var(--accent2)}
+.flow-arrow{color:var(--dim);font-size:16px}
+.flow-label{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
+
+/* -- Checklist -- */
+.checklist{max-width:1100px;margin:30px auto;padding:0 24px}
+.checklist-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px 28px}
+.checklist-card h2{font-size:20px;font-weight:800;margin-bottom:14px;color:var(--accent)}
+.checklist-item{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:14px;color:#c5cad8;cursor:pointer;user-select:none}
+.checklist-item input[type="checkbox"]{accent-color:var(--accent);width:16px;height:16px;cursor:pointer}
+.checklist-item.checked{color:var(--dim);text-decoration:line-through}
+
+/* -- Element Grid -- */
+.element-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin:14px 0}
+.element-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:all 0.2s;text-align:center;user-select:none}
+.element-card:hover{border-color:var(--accent);transform:translateY(-2px);background:rgba(249,115,22,0.04)}
+.element-card.active{border-color:var(--accent);background:rgba(249,115,22,0.08)}
+.element-card .el-icon{font-size:24px;margin-bottom:6px}
+.element-card .el-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;font-family:var(--mono)}
+.element-card .el-html{font-size:10px;color:var(--dim);font-family:var(--mono)}
+.el-info{background:rgba(249,115,22,0.06);border:1px solid rgba(249,115,22,0.15);border-radius:12px;padding:16px 20px;margin-top:12px;font-size:14px;color:#e8b5a5;display:none}
+.el-info.show{display:block}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-badge">Build-Along Guide</div>
+  <h1>Unity <span class="orange">AR</span> Journey</h1>
+  <p>Build your first augmented reality app in Unity &mdash; place objects in the real world, track surfaces, and interact with AR content. Phone camera required.</p>
+  <div class="hero-sub">Part 1: AR Basics &middot; Part 2: Build It &middot; Bonus: Polish</div>
+</div>
+
+<div class="nav">
+  <div class="nav-div">-- Part 1: AR Basics --</div>
+  <a href="#s0">00 What is AR</a>
+  <a href="#s1">01 Project Setup</a>
+  <a href="#s2">02 AR Session</a>
+  <a href="#s3">03 Plane Detection</a>
+  <a href="#s4">04 Place Objects</a>
+  <div class="nav-div">-- Part 2: Build It --</div>
+  <a href="#s5">05 Touch Input</a>
+  <a href="#s6">06 Scale &amp; Rotate</a>
+  <a href="#s7">07 Multiple Objects</a>
+  <a href="#s8">08 AR Raycast</a>
+  <div class="nav-div">-- Bonus --</div>
+  <a href="#s9">09 UI Overlay</a>
+  <a href="#s10">10 Build to Phone</a>
+  <a href="#checklist">Checklist</a>
+</div>
+
+<!-- ══ PART 1 ══ -->
+<div class="part-div"><div class="part-inner">
+  <div class="part-label">Part 1 of 2</div>
+  <div class="part-title">AR Basics</div>
+  <p class="part-desc">Five steps. Learn what AR is, set up your project, and place your first virtual object in the real world.</p>
+</div></div>
+
+<div class="wrap">
+
+<!-- ── 00 ── -->
+<section class="lesson" id="s0">
+  <div class="lesson-head"><span class="lesson-num">00</span><h2 class="lesson-title">What is AR?</h2></div>
+  <div class="card">
+    <p><strong>Augmented Reality</strong> overlays digital content on the real world through your phone's camera. You see your room &mdash; but with virtual objects sitting on your desk, your floor, your walls.</p>
+    <div class="analogy">AR Foundation is like Three.js but the camera is your phone, the scene is the real world, and the ground plane is your actual floor.</div>
+  </div>
+
+  <div class="card">
+    <p><strong>Three types of AR tracking:</strong></p>
+    <div class="two">
+      <div>
+        <p><strong>Marker-based</strong> (Image Tracking)<br><span style="color:var(--dim)">Detects a specific image (poster, QR code) and pins content to it.</span></p>
+        <p style="margin-top:8px"><strong>Markerless</strong> (Plane Detection)<br><span style="color:var(--dim)">Detects flat surfaces (floors, tables, walls) and lets you place objects. This is what we'll build.</span></p>
+      </div>
+      <div>
+        <p><strong>Face Tracking</strong><br><span style="color:var(--dim)">Detects faces and overlays filters, masks, or effects. Used in Snapchat and Instagram filters.</span></p>
+        <p style="margin-top:8px"><strong class="cyan">AR Foundation</strong><br><span style="color:var(--dim)">Unity's cross-platform AR framework. One codebase &rarr; works on ARCore (Android) + ARKit (iOS).</span></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p>If you know <strong class="cyan">Three.js</strong>, you already know the concepts. The names change, but the ideas are the same:</p>
+    <table class="compare-table">
+      <thead><tr><th>Concept</th><th>Web / Three.js</th><th>Unity AR</th></tr></thead>
+      <tbody>
+        <tr><td>3D Scene</td><td>THREE.Scene()</td><td>XR Origin</td></tr>
+        <tr><td>Camera</td><td>PerspectiveCamera</td><td>AR Camera (phone camera feed)</td></tr>
+        <tr><td>Ground</td><td>PlaneGeometry</td><td>AR Plane (detected surface)</td></tr>
+        <tr><td>Click</td><td>raycaster.intersectObjects</td><td>AR Raycast</td></tr>
+        <tr><td>Place object</td><td>scene.add(mesh)</td><td>Instantiate(prefab, pose)</td></tr>
+        <tr><td>Transform</td><td>mesh.position.set()</td><td>transform.position =</td></tr>
+        <tr><td>Lighting</td><td>DirectionalLight</td><td>AR Light Estimation</td></tr>
+        <tr><td>Screen touch</td><td>addEventListener('click')</td><td>Input.GetTouch(0)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Interactive AR Demo -->
+  <div class="demo-box">
+    <div class="demo-label">LIVE PREVIEW</div>
+    <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;justify-content:center">
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="phone-screen" id="arDemo00">
+          <div class="phone-cam-label">CAMERA FEED</div>
+          <div class="ar-plane" id="plane00"></div>
+          <div class="ar-object ar-cube" id="cube00" style="bottom:95px;left:50%;transform:translateX(-50%);display:none"></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;min-width:160px">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:1px;margin-bottom:4px">TOGGLE FEATURES</div>
+        <button class="btn" id="togglePlane00" style="border-color:var(--accent);color:var(--accent)">Toggle Plane Grid</button>
+        <button class="btn" id="toggleCube00" style="border-color:var(--accent2);color:var(--accent2)">Place / Remove Cube</button>
+        <div class="state-indicator" id="state00">Plane: visible &middot; Object: none</div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- ── 01 ── -->
+<section class="lesson" id="s1">
+  <div class="lesson-head"><span class="lesson-num">01</span><h2 class="lesson-title">Project Setup</h2></div>
+  <div class="card">
+    <p>Create a new Unity project using the <strong>3D (URP)</strong> template. Then install three packages from the Package Manager.</p>
+    <div class="unity-note"><strong>How to open:</strong> Window &rarr; Package Manager &rarr; search the Unity Registry for each package below.</div>
+  </div>
+
+  <div class="card">
+    <p><strong>Install these packages:</strong></p>
+    <div class="inspector">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> Package Manager</div>
+      <div class="inspector-row"><div class="inspector-label">AR Foundation</div><div class="inspector-val"><span class="highlight">5.x.x</span> &mdash; core AR framework</div></div>
+      <div class="inspector-row"><div class="inspector-label">ARCore XR Plugin</div><div class="inspector-val"><span class="highlight">5.x.x</span> &mdash; Android support</div></div>
+      <div class="inspector-row"><div class="inspector-label">ARKit XR Plugin</div><div class="inspector-val"><span class="highlight">5.x.x</span> &mdash; iOS support</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p><strong>XR Plug-in Management</strong> &mdash; enable the platforms you need:</p>
+    <div class="inspector">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> Project Settings &rarr; XR Plug-in Management</div>
+      <div class="inspector-row"><div class="inspector-label">Android tab</div><div class="inspector-val">&#9745; <span class="highlight">ARCore</span></div></div>
+      <div class="inspector-row"><div class="inspector-label">iOS tab</div><div class="inspector-val">&#9745; <span class="highlight">ARKit</span></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p><strong>Player Settings</strong> &mdash; minimum requirements:</p>
+    <div class="inspector">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> Player Settings (Android)</div>
+      <div class="inspector-row"><div class="inspector-label">Min API Level</div><div class="inspector-val"><span class="highlight">Android 7.0 (API 24)</span></div></div>
+      <div class="inspector-row"><div class="inspector-label">Scripting Backend</div><div class="inspector-val"><span class="highlight">IL2CPP</span></div></div>
+      <div class="inspector-row"><div class="inspector-label">Target Arch.</div><div class="inspector-val">&#9745; ARM64</div></div>
+    </div>
+    <div class="inspector">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> Player Settings (iOS)</div>
+      <div class="inspector-row"><div class="inspector-label">Camera Usage</div><div class="inspector-val"><span class="highlight">"Required for AR"</span></div></div>
+      <div class="inspector-row"><div class="inspector-label">Target Min iOS</div><div class="inspector-val"><span class="highlight">12.0</span></div></div>
+    </div>
+    <div class="warn-note"><strong>AR apps CANNOT run in the Unity Editor.</strong> You must build to a real phone to test. There is no shortcut for beginners.</div>
+    <div class="unity-note"><strong>Delete the default Main Camera</strong> &mdash; the AR Camera will replace it in the next step.</div>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- ── 02 ── -->
+<section class="lesson" id="s2">
+  <div class="lesson-head"><span class="lesson-num">02</span><h2 class="lesson-title">AR Session</h2></div>
+  <div class="card">
+    <p>Every AR app needs two things: an <strong>AR Session</strong> (manages the AR lifecycle) and an <strong>XR Origin</strong> (the real-world origin point for your virtual content).</p>
+    <div class="analogy">AR Session is like <code>renderer.setAnimationLoop()</code> &mdash; it runs the AR loop. XR Origin is like <code>scene.position</code> &mdash; the origin of your virtual world relative to the real world.</div>
+  </div>
+
+  <div class="card">
+    <p><strong>Hierarchy</strong> after setup:</p>
+    <div class="hierarchy">
+      <div class="hierarchy-title">Hierarchy</div>
+      <div class="hierarchy-item selected"><span class="indent" style="width:0"></span>&#9670; AR Session</div>
+      <div class="hierarchy-item"><span class="indent" style="width:0"></span>&#9670; XR Origin</div>
+      <div class="hierarchy-item"><span class="indent" style="width:16px"></span>&#128247; AR Camera [Tag: MainCamera]</div>
+    </div>
+    <div class="unity-note"><strong>How to create:</strong> Right-click Hierarchy &rarr; XR &rarr; AR Session. Then Right-click &rarr; XR &rarr; XR Origin (this auto-creates an AR Camera child).</div>
+  </div>
+
+  <div class="card">
+    <p><strong>Inspector</strong> &mdash; AR Session component:</p>
+    <div class="inspector">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> AR Session</div>
+      <div class="inspector-row"><div class="inspector-label">Attempt Update</div><div class="inspector-val"><span class="highlight">&#9745;</span></div></div>
+      <div class="inspector-row"><div class="inspector-label">Match Frame Rate</div><div class="inspector-val">&#9745;</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p><strong>Inspector</strong> &mdash; XR Origin:</p>
+    <div class="inspector">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> XR Origin</div>
+      <div class="inspector-row"><div class="inspector-label">Camera</div><div class="inspector-val"><span class="highlight">AR Camera</span></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p><strong>Inspector</strong> &mdash; AR Camera (child of XR Origin):</p>
+    <div class="inspector">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> AR Camera Manager</div>
+      <div class="inspector-row"><div class="inspector-label">Auto Focus</div><div class="inspector-val"><span class="highlight">&#9745; Enabled</span></div></div>
+      <div class="inspector-row"><div class="inspector-label">Light Estimation</div><div class="inspector-val">Everything</div></div>
+    </div>
+    <div class="inspector">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> AR Camera Background</div>
+      <div class="inspector-row"><div class="inspector-label">Use Custom Mat.</div><div class="inspector-val">&#9744;</div></div>
+    </div>
+    <p style="margin-top:12px;color:var(--dim);font-size:13px"><strong style="color:var(--accent)">AR Camera Manager</strong> = controls the phone camera. <strong style="color:var(--accent)">AR Camera Background</strong> = renders the live camera feed behind your virtual objects.</p>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- ── 03 ── -->
+<section class="lesson" id="s3">
+  <div class="lesson-head"><span class="lesson-num">03</span><h2 class="lesson-title">Plane Detection</h2></div>
+  <div class="card">
+    <p>The <strong>AR Plane Manager</strong> detects flat surfaces in the real world &mdash; floors, tables, walls. Once detected, they appear as mesh outlines you can place objects on.</p>
+    <div class="analogy">Like auto-detecting the ground in Three.js, but the "ground" is your actual physical floor. The phone's sensors do the heavy lifting.</div>
+    <div class="unity-note"><strong>Add it to:</strong> Select XR Origin &rarr; Add Component &rarr; AR Plane Manager</div>
+  </div>
+
+  <div class="card">
+    <p><strong>Inspector</strong> &mdash; AR Plane Manager settings:</p>
+    <div class="inspector">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> AR Plane Manager</div>
+      <div class="inspector-row"><div class="inspector-label">Detection Mode</div><div class="inspector-val"><span class="highlight">Horizontal</span></div></div>
+      <div class="inspector-row"><div class="inspector-label">Plane Prefab</div><div class="inspector-val">AR Default Plane (or custom)</div></div>
+    </div>
+    <p style="margin-top:10px;color:var(--dim);font-size:13px"><strong style="color:var(--accent)">Detection Modes:</strong> Horizontal (floors, tables), Vertical (walls), Everything (both)</p>
+  </div>
+
+  <!-- Interactive Plane Detection Demo -->
+  <div class="demo-box">
+    <div class="demo-label">LIVE PREVIEW</div>
+    <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;justify-content:center">
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="phone-screen" id="arDemo03">
+          <div class="phone-cam-label">CAMERA FEED</div>
+          <div class="ar-plane" id="hPlane03" style="opacity:1"></div>
+          <div class="ar-plane vertical" id="vPlane03" style="opacity:0"></div>
+          <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:8px;color:rgba(249,115,22,0.5);white-space:nowrap" id="planeStatus03">Horizontal plane detected</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;min-width:160px">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:1px;margin-bottom:4px">DETECTION MODE</div>
+        <button class="shape-btn active" id="modeH03">Horizontal</button>
+        <button class="shape-btn" id="modeV03">Vertical</button>
+        <button class="shape-btn" id="modeA03">Everything</button>
+        <div class="state-indicator" id="state03">Mode: Horizontal</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p><strong>Create a Plane Prefab</strong> (or use the default):</p>
+    <div class="hierarchy">
+      <div class="hierarchy-title">Plane Prefab Components</div>
+      <div class="hierarchy-item selected"><span class="indent" style="width:0"></span>&#9670; AR Plane Prefab</div>
+      <div class="hierarchy-item"><span class="indent" style="width:16px"></span>+ AR Plane</div>
+      <div class="hierarchy-item"><span class="indent" style="width:16px"></span>+ AR Plane Mesh Visualizer</div>
+      <div class="hierarchy-item"><span class="indent" style="width:16px"></span>+ Mesh Renderer</div>
+      <div class="hierarchy-item"><span class="indent" style="width:16px"></span>+ Line Renderer</div>
+    </div>
+    <div class="unity-note"><strong>Tip:</strong> Point your phone at a flat surface and move slowly &mdash; AR needs a few seconds to detect planes. Good lighting helps.</div>
+  </div>
+
+  <div class="card">
+    <p><strong>Log detected planes</strong> with a simple script:</p>
+    <div class="code-head">
+      <span class="code-label">C# &mdash; PlaneLogger.cs</span>
+      <div><button class="cbtn" onclick="copyEl('code-03')">Copy</button></div>
+    </div>
+    <pre><code id="code-03"><span class="kw">using</span> UnityEngine;
+<span class="kw">using</span> UnityEngine.XR.ARFoundation;
+
+<span class="kw">public class</span> <span class="ty">PlaneLogger</span> : <span class="ty">MonoBehaviour</span>
+{
+    <span class="ty">ARPlaneManager</span> planeManager;
+
+    <span class="kw">void</span> <span class="fn">Awake</span>() => planeManager = GetComponent&lt;<span class="ty">ARPlaneManager</span>&gt;();
+
+    <span class="kw">void</span> <span class="fn">OnEnable</span>() => planeManager.planesChanged += OnPlanesChanged;
+    <span class="kw">void</span> <span class="fn">OnDisable</span>() => planeManager.planesChanged -= OnPlanesChanged;
+
+    <span class="kw">void</span> <span class="fn">OnPlanesChanged</span>(<span class="ty">ARPlanesChangedEventArgs</span> args)
+    {
+        <span class="kw">foreach</span> (<span class="kw">var</span> plane <span class="kw">in</span> args.added)
+            Debug.Log(<span class="st">$"New plane: {plane.alignment}"</span>);
+    }
+}</code></pre>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- ── 04 ── -->
+<section class="lesson" id="s4">
+  <div class="lesson-head"><span class="lesson-num">04</span><h2 class="lesson-title">Place Objects</h2></div>
+  <div class="card">
+    <p>Now the magic: <strong>tap a detected surface</strong> and a virtual object appears there. This uses an <strong>AR Raycast</strong> to find where your finger is pointing in the real world.</p>
+    <div class="analogy">Like raycaster.intersectObjects() in Three.js, but the ray goes from your screen tap through the camera into the real world and hits a detected plane.</div>
+  </div>
+
+  <div class="card">
+    <p><strong>Add AR Raycast Manager</strong> to XR Origin, then create this script:</p>
+    <div class="code-head">
+      <span class="code-label">C# &mdash; PlaceObject.cs</span>
+      <div><button class="cbtn" onclick="copyEl('code-04')">Copy</button></div>
+    </div>
+    <pre><code id="code-04"><span class="kw">using</span> System.Collections.Generic;
+<span class="kw">using</span> UnityEngine;
+<span class="kw">using</span> UnityEngine.XR.ARFoundation;
+<span class="kw">using</span> UnityEngine.XR.ARSubsystems;
+
+<span class="kw">public class</span> <span class="ty">PlaceObject</span> : <span class="ty">MonoBehaviour</span>
+{
+    <span class="kw">public</span> <span class="ty">GameObject</span> prefab;
+    <span class="ty">ARRaycastManager</span> raycastManager;
+    <span class="kw">static</span> <span class="ty">List</span>&lt;<span class="ty">ARRaycastHit</span>&gt; hits = <span class="kw">new</span> <span class="ty">List</span>&lt;<span class="ty">ARRaycastHit</span>&gt;();
+    <span class="ty">GameObject</span> placed;
+
+    <span class="kw">void</span> <span class="fn">Awake</span>() => raycastManager = GetComponent&lt;<span class="ty">ARRaycastManager</span>&gt;();
+
+    <span class="kw">void</span> <span class="fn">Update</span>()
+    {
+        <span class="kw">if</span> (Input.touchCount == <span class="nm">0</span>) <span class="kw">return</span>;
+        <span class="ty">Touch</span> touch = Input.GetTouch(<span class="nm">0</span>);
+        <span class="kw">if</span> (touch.phase != <span class="ty">TouchPhase</span>.Began) <span class="kw">return</span>;
+
+        <span class="kw">if</span> (raycastManager.Raycast(touch.position, hits,
+            <span class="ty">TrackableTypes</span>.PlaneWithinPolygon))
+        {
+            <span class="ty">Pose</span> pose = hits[<span class="nm">0</span>].pose;
+            <span class="kw">if</span> (placed == <span class="kw">null</span>)
+                placed = Instantiate(prefab, pose.position, pose.rotation);
+            <span class="kw">else</span>
+                placed.transform.SetPositionAndRotation(
+                    pose.position, pose.rotation);
+        }
+    }
+}</code></pre>
+  </div>
+
+  <div class="card">
+    <p><strong>Hierarchy</strong> after setup:</p>
+    <div class="hierarchy">
+      <div class="hierarchy-title">Hierarchy</div>
+      <div class="hierarchy-item"><span class="indent" style="width:0"></span>&#9670; AR Session</div>
+      <div class="hierarchy-item selected"><span class="indent" style="width:0"></span>&#9670; XR Origin</div>
+      <div class="hierarchy-item"><span class="indent" style="width:16px"></span>&#128247; AR Camera</div>
+      <div class="hierarchy-item"><span class="indent" style="width:16px"></span>+ AR Plane Manager</div>
+      <div class="hierarchy-item"><span class="indent" style="width:16px"></span>+ AR Raycast Manager</div>
+      <div class="hierarchy-item"><span class="indent" style="width:16px"></span>+ PlaceObject (Script)</div>
+    </div>
+    <div class="inspector">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> PlaceObject (Script)</div>
+      <div class="inspector-row"><div class="inspector-label">Prefab</div><div class="inspector-val"><span class="highlight">MyCube (Prefab)</span></div></div>
+    </div>
+  </div>
+
+  <!-- Interactive Place Object Demo -->
+  <div class="demo-box">
+    <div class="demo-label">LIVE PREVIEW</div>
+    <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;justify-content:center">
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="phone-screen" id="arDemo04" style="cursor:crosshair">
+          <div class="phone-cam-label">TAP ON THE PLANE</div>
+          <div class="ar-plane" id="plane04"></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;min-width:160px">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:1px;margin-bottom:4px">TAP THE PLANE TO PLACE</div>
+        <button class="btn" id="clearBtn04">Clear Object</button>
+        <div class="state-indicator" id="state04">Tap the surface to place a cube</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="success-note"><strong>Tap a detected surface &rarr; your object appears in the real world!</strong> This single script is the foundation of every AR placement app.</div>
+</section>
+
+</div>
+
+<!-- ══ PART 2 ══ -->
+<div class="part-div"><div class="part-inner">
+  <div class="part-label">Part 2 of 2</div>
+  <div class="part-title">Build It</div>
+  <p class="part-desc">Four steps. Touch input, scaling, rotating, multiple objects, and advanced raycasting.</p>
+</div></div>
+
+<div class="wrap">
+
+<!-- ── 05 ── -->
+<section class="lesson" id="s5">
+  <div class="lesson-head"><span class="lesson-num">05</span><h2 class="lesson-title">Touch Input</h2></div>
+  <div class="card">
+    <p>Mobile AR uses <strong>touch</strong>, not mouse clicks. Every touch has a <strong>phase</strong> that tells you what the finger is doing right now.</p>
+    <div class="analogy">Touch phases are like mouse events: Began = mousedown, Moved = mousemove, Ended = mouseup. Same idea, different device.</div>
+  </div>
+
+  <div class="card">
+    <p><strong>Touch phases:</strong></p>
+    <table class="compare-table">
+      <thead><tr><th>Phase</th><th>Mouse Equivalent</th><th>When</th></tr></thead>
+      <tbody>
+        <tr><td>TouchPhase.Began</td><td>mousedown</td><td>Finger first touches screen</td></tr>
+        <tr><td>TouchPhase.Moved</td><td>mousemove (while dragging)</td><td>Finger slides on screen</td></tr>
+        <tr><td>TouchPhase.Stationary</td><td>&mdash;</td><td>Finger is down but not moving</td></tr>
+        <tr><td>TouchPhase.Ended</td><td>mouseup</td><td>Finger lifts off screen</td></tr>
+        <tr><td>TouchPhase.Canceled</td><td>&mdash;</td><td>System interrupted the touch</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="code-head">
+      <span class="code-label">C# &mdash; Touch input handler</span>
+      <div><button class="cbtn" onclick="copyEl('code-05')">Copy</button></div>
+    </div>
+    <pre><code id="code-05"><span class="kw">void</span> <span class="fn">Update</span>()
+{
+    <span class="kw">if</span> (Input.touchCount == <span class="nm">0</span>) <span class="kw">return</span>;
+    <span class="ty">Touch</span> touch = Input.GetTouch(<span class="nm">0</span>);
+
+    <span class="kw">switch</span> (touch.phase)
+    {
+        <span class="kw">case</span> <span class="ty">TouchPhase</span>.Began:
+            Debug.Log(<span class="st">"Finger down at: "</span> + touch.position);
+            <span class="kw">break</span>;
+        <span class="kw">case</span> <span class="ty">TouchPhase</span>.Moved:
+            Debug.Log(<span class="st">"Finger moving: "</span> + touch.deltaPosition);
+            <span class="kw">break</span>;
+        <span class="kw">case</span> <span class="ty">TouchPhase</span>.Ended:
+            Debug.Log(<span class="st">"Finger lifted"</span>);
+            <span class="kw">break</span>;
+    }
+}</code></pre>
+  </div>
+
+  <!-- Interactive Touch Demo -->
+  <div class="demo-box">
+    <div class="demo-label">LIVE PREVIEW</div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:1px;margin-bottom:8px">MOVE YOUR MOUSE / FINGER INSIDE THE BOX</div>
+    <div class="touch-area" id="touchArea">
+      <div class="touch-dot" id="touchDot" style="opacity:0"></div>
+    </div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:8px">
+      <div style="font-family:var(--mono);font-size:11px"><span style="color:var(--dim)">Phase:</span> <span id="touchPhase" style="color:var(--accent)">--</span></div>
+      <div style="font-family:var(--mono);font-size:11px"><span style="color:var(--dim)">Position:</span> <span id="touchPos" style="color:var(--accent2)">--</span></div>
+      <div style="font-family:var(--mono);font-size:11px"><span style="color:var(--dim)">Delta:</span> <span id="touchDelta" style="color:var(--accent4)">--</span></div>
+    </div>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- ── 06 ── -->
+<section class="lesson" id="s6">
+  <div class="lesson-head"><span class="lesson-num">06</span><h2 class="lesson-title">Scale &amp; Rotate</h2></div>
+  <div class="card">
+    <p>Two-finger gestures let users <strong>pinch to scale</strong> and <strong>twist to rotate</strong> placed objects. This measures the distance and angle between two touch points.</p>
+    <div class="analogy">Like CSS transform: scale() and rotate() &mdash; but driven by finger gestures instead of code values.</div>
+  </div>
+
+  <div class="card">
+    <div class="code-head">
+      <span class="code-label">C# &mdash; ScaleRotate.cs</span>
+      <div><button class="cbtn" onclick="copyEl('code-06')">Copy</button></div>
+    </div>
+    <pre><code id="code-06"><span class="kw">using</span> UnityEngine;
+
+<span class="kw">public class</span> <span class="ty">ScaleRotate</span> : <span class="ty">MonoBehaviour</span>
+{
+    <span class="kw">public float</span> scaleSpeed = <span class="nm">0.01f</span>;
+    <span class="kw">public float</span> rotateSpeed = <span class="nm">0.5f</span>;
+
+    <span class="kw">void</span> <span class="fn">Update</span>()
+    {
+        <span class="kw">if</span> (Input.touchCount == <span class="nm">2</span>)
+        {
+            <span class="ty">Touch</span> t0 = Input.GetTouch(<span class="nm">0</span>);
+            <span class="ty">Touch</span> t1 = Input.GetTouch(<span class="nm">1</span>);
+
+            <span class="cm">// Pinch to scale</span>
+            <span class="kw">float</span> prevDist = (t0.position - t0.deltaPosition
+                - (t1.position - t1.deltaPosition)).magnitude;
+            <span class="kw">float</span> currDist = (t0.position - t1.position).magnitude;
+            <span class="kw">float</span> delta = currDist - prevDist;
+            transform.localScale += <span class="ty">Vector3</span>.one * delta * scaleSpeed;
+            transform.localScale = <span class="ty">Vector3</span>.Max(
+                transform.localScale, <span class="ty">Vector3</span>.one * <span class="nm">0.1f</span>);
+
+            <span class="cm">// Twist to rotate</span>
+            <span class="ty">Vector2</span> prevDir = (t0.position - t0.deltaPosition)
+                - (t1.position - t1.deltaPosition);
+            <span class="ty">Vector2</span> currDir = t0.position - t1.position;
+            <span class="kw">float</span> angle = <span class="ty">Vector2</span>.SignedAngle(prevDir, currDir);
+            transform.Rotate(<span class="ty">Vector3</span>.up, angle * rotateSpeed);
+        }
+    }
+}</code></pre>
+  </div>
+
+  <div class="card">
+    <div class="inspector">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> ScaleRotate (Script)</div>
+      <div class="inspector-row"><div class="inspector-label">Scale Speed</div><div class="inspector-val"><span class="highlight">0.01</span></div></div>
+      <div class="inspector-row"><div class="inspector-label">Rotate Speed</div><div class="inspector-val"><span class="highlight">0.5</span></div></div>
+    </div>
+    <div class="unity-note"><strong>Attach this script to the placed prefab</strong>, not to the XR Origin. Each placed object handles its own scaling and rotation.</div>
+  </div>
+
+  <!-- Interactive Scale & Rotate Demo -->
+  <div class="demo-box">
+    <div class="demo-label">LIVE PREVIEW</div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:16px 0">
+      <div style="width:120px;height:120px;display:flex;align-items:center;justify-content:center">
+        <div id="srObject" style="width:60px;height:60px;background:var(--accent);border:2px solid rgba(255,255,255,0.3);box-shadow:0 4px 16px rgba(249,115,22,0.4);transition:transform 0.15s,width 0.15s,height 0.15s;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;color:#fff;font-weight:700">AR</div>
+      </div>
+      <div class="ctrl" style="margin-top:0;justify-content:center">
+        <label>Scale:</label>
+        <input type="range" id="srScale" min="30" max="110" value="60">
+        <span class="vv" id="srScaleVal">1.0x</span>
+        <label>Rotation:</label>
+        <input type="range" id="srRotate" min="0" max="360" value="0">
+        <span class="vv" id="srRotateVal">0&deg;</span>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- ── 07 ── -->
+<section class="lesson" id="s7">
+  <div class="lesson-head"><span class="lesson-num">07</span><h2 class="lesson-title">Multiple Objects</h2></div>
+  <div class="card">
+    <p>Let's level up: place <strong>multiple objects</strong> of different types, and add a UI button to switch between them. Each tap creates a <strong>new</strong> object.</p>
+    <div class="analogy">Like an array of mesh constructors in Three.js. Pick which one to use, then scene.add() on each click.</div>
+  </div>
+
+  <div class="card">
+    <div class="code-head">
+      <span class="code-label">C# &mdash; MultiPlacer.cs</span>
+      <div><button class="cbtn" onclick="copyEl('code-07')">Copy</button></div>
+    </div>
+    <pre><code id="code-07"><span class="kw">using</span> System.Collections.Generic;
+<span class="kw">using</span> UnityEngine;
+<span class="kw">using</span> UnityEngine.XR.ARFoundation;
+<span class="kw">using</span> UnityEngine.XR.ARSubsystems;
+
+<span class="kw">public class</span> <span class="ty">MultiPlacer</span> : <span class="ty">MonoBehaviour</span>
+{
+    <span class="kw">public</span> <span class="ty">GameObject</span>[] prefabs;
+    <span class="kw">public int</span> currentIndex = <span class="nm">0</span>;
+
+    <span class="ty">ARRaycastManager</span> raycastManager;
+    <span class="kw">static</span> <span class="ty">List</span>&lt;<span class="ty">ARRaycastHit</span>&gt; hits = <span class="kw">new</span> <span class="ty">List</span>&lt;<span class="ty">ARRaycastHit</span>&gt;();
+    <span class="ty">List</span>&lt;<span class="ty">GameObject</span>&gt; placed = <span class="kw">new</span> <span class="ty">List</span>&lt;<span class="ty">GameObject</span>&gt;();
+
+    <span class="kw">void</span> <span class="fn">Awake</span>() => raycastManager =
+        GetComponent&lt;<span class="ty">ARRaycastManager</span>&gt;();
+
+    <span class="kw">void</span> <span class="fn">Update</span>()
+    {
+        <span class="kw">if</span> (Input.touchCount == <span class="nm">0</span>) <span class="kw">return</span>;
+        <span class="ty">Touch</span> touch = Input.GetTouch(<span class="nm">0</span>);
+        <span class="kw">if</span> (touch.phase != <span class="ty">TouchPhase</span>.Began) <span class="kw">return</span>;
+
+        <span class="kw">if</span> (raycastManager.Raycast(touch.position, hits,
+            <span class="ty">TrackableTypes</span>.PlaneWithinPolygon))
+        {
+            <span class="kw">var</span> obj = Instantiate(prefabs[currentIndex],
+                hits[<span class="nm">0</span>].pose.position, hits[<span class="nm">0</span>].pose.rotation);
+            placed.Add(obj);
+        }
+    }
+
+    <span class="kw">public void</span> <span class="fn">NextPrefab</span>() =>
+        currentIndex = (currentIndex + <span class="nm">1</span>) % prefabs.Length;
+
+    <span class="kw">public void</span> <span class="fn">ClearAll</span>()
+    {
+        <span class="kw">foreach</span> (<span class="kw">var</span> obj <span class="kw">in</span> placed) Destroy(obj);
+        placed.Clear();
+    }
+}</code></pre>
+  </div>
+
+  <div class="card">
+    <div class="inspector">
+      <div class="inspector-header"><span class="arrow">&#9660;</span> MultiPlacer (Script)</div>
+      <div class="inspector-row"><div class="inspector-label">Prefabs</div><div class="inspector-val"><span class="highlight">Size: 3</span></div></div>
+      <div class="inspector-row"><div class="inspector-label">&nbsp;&nbsp;Element 0</div><div class="inspector-val">Cube (Prefab)</div></div>
+      <div class="inspector-row"><div class="inspector-label">&nbsp;&nbsp;Element 1</div><div class="inspector-val">Sphere (Prefab)</div></div>
+      <div class="inspector-row"><div class="inspector-label">&nbsp;&nbsp;Element 2</div><div class="inspector-val">Cylinder (Prefab)</div></div>
+      <div class="inspector-row"><div class="inspector-label">Current Index</div><div class="inspector-val">0</div></div>
+    </div>
+  </div>
+
+  <!-- Interactive Multi-Placer Demo -->
+  <div class="demo-box">
+    <div class="demo-label">LIVE PREVIEW</div>
+    <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;justify-content:center">
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="phone-screen" id="arDemo07" style="cursor:crosshair">
+          <div class="phone-cam-label">TAP TO PLACE OBJECTS</div>
+          <div class="ar-plane" id="plane07"></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;min-width:160px">
+        <div style="font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:1px;margin-bottom:4px">SELECT SHAPE</div>
+        <button class="shape-btn active" id="shapeCube07" data-shape="cube">Cube</button>
+        <button class="shape-btn" id="shapeSphere07" data-shape="sphere">Sphere</button>
+        <button class="shape-btn" id="shapeCylinder07" data-shape="cylinder">Cylinder</button>
+        <button class="btn" id="clearAll07" style="margin-top:8px;border-color:#ff6b6b;color:#ff6b6b">Clear All</button>
+        <div class="state-indicator" id="state07">Objects: 0 &middot; Shape: Cube</div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- ── 08 ── -->
+<section class="lesson" id="s8">
+  <div class="lesson-head"><span class="lesson-num">08</span><h2 class="lesson-title">AR Raycast Deep Dive</h2></div>
+  <div class="card">
+    <p>There are <strong>two types of raycasts</strong> in AR, and mixing them up is a common mistake:</p>
+    <div class="two">
+      <div>
+        <p><strong>AR Raycast</strong><br><span style="color:var(--dim)">Hits <em>real-world</em> tracked surfaces (planes, point clouds). Used to find where to PLACE new objects.</span></p>
+      </div>
+      <div>
+        <p><strong class="cyan">Physics Raycast</strong><br><span style="color:var(--dim)">Hits Unity <em>colliders</em> on existing GameObjects. Used to SELECT already-placed objects.</span></p>
+      </div>
+    </div>
+    <div class="analogy">AR Raycast = "where is the real floor?" Physics Raycast = "did I tap an existing cube?" You need BOTH for a complete AR experience.</div>
+  </div>
+
+  <div class="card">
+    <p><strong>The smart pattern:</strong> try Physics Raycast first (select existing). If nothing hit, try AR Raycast (place new).</p>
+    <div class="code-head">
+      <span class="code-label">C# &mdash; Combined raycast</span>
+      <div><button class="cbtn" onclick="copyEl('code-08')">Copy</button></div>
+    </div>
+    <pre><code id="code-08"><span class="kw">void</span> <span class="fn">Update</span>()
+{
+    <span class="kw">if</span> (Input.touchCount == <span class="nm">0</span> ||
+        Input.GetTouch(<span class="nm">0</span>).phase != <span class="ty">TouchPhase</span>.Began) <span class="kw">return</span>;
+
+    <span class="ty">Touch</span> touch = Input.GetTouch(<span class="nm">0</span>);
+
+    <span class="cm">// First: did we tap an existing object?</span>
+    <span class="ty">Ray</span> ray = <span class="ty">Camera</span>.main.ScreenPointToRay(touch.position);
+    <span class="kw">if</span> (<span class="ty">Physics</span>.Raycast(ray, <span class="kw">out</span> <span class="ty">RaycastHit</span> hit, <span class="nm">100f</span>))
+    {
+        <span class="cm">// Tapped an existing object - select it</span>
+        SelectObject(hit.transform.gameObject);
+        <span class="kw">return</span>;
+    }
+
+    <span class="cm">// Second: tap on AR plane to place new object</span>
+    <span class="kw">if</span> (raycastManager.Raycast(touch.position, hits,
+        <span class="ty">TrackableTypes</span>.PlaneWithinPolygon))
+    {
+        PlaceNew(hits[<span class="nm">0</span>].pose);
+    }
+}</code></pre>
+  </div>
+
+  <!-- Flow Chart -->
+  <div class="demo-box">
+    <div class="demo-label">DECISION FLOW</div>
+    <div class="flow-chart" id="flowChart">
+      <div class="flow-node start">Touch<br>Detected</div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-node">Physics<br>Raycast?</div>
+      <div style="display:flex;flex-direction:column;gap:4px;align-items:center">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="flow-label">YES</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node yes">Select<br>Object</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="flow-label">NO</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-node">AR<br>Raycast?</div>
+          <div style="display:flex;flex-direction:column;gap:4px;align-items:center">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="flow-label">YES</div>
+              <div class="flow-arrow">&rarr;</div>
+              <div class="flow-node action">Place<br>New</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="flow-label">NO</div>
+              <div class="flow-arrow">&rarr;</div>
+              <div class="flow-node no">Ignore</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="warn-note"><strong>Physics Raycast needs colliders!</strong> Make sure your placed prefabs have a Collider component (Box, Sphere, or Mesh Collider). Without a collider, Physics.Raycast will pass right through them.</div>
+  </div>
+</section>
+
+</div>
+
+<!-- ══ BONUS ══ -->
+<div class="part-div"><div class="part-inner" style="background:linear-gradient(135deg,rgba(52,211,153,0.06),transparent)">
+  <div class="part-label" style="color:var(--accent4)">Bonus</div>
+  <div class="part-title">Polish</div>
+  <p class="part-desc">Add a UI overlay on top of AR, and build to a real phone.</p>
+</div></div>
+
+<div class="wrap">
+
+<!-- ── 09 ── -->
+<section class="lesson" id="s9">
+  <div class="lesson-head"><span class="lesson-num" style="color:var(--accent4);background:rgba(52,211,153,0.12);border-color:rgba(52,211,153,0.25)">09</span><h2 class="lesson-title">UI Overlay</h2></div>
+  <div class="card">
+    <p>AR apps need buttons too! Add a <strong>Canvas (Screen Space &mdash; Overlay)</strong> on top of the camera feed to create controls for your AR experience.</p>
+    <div class="unity-note"><strong>See the <a href="unity-canvas-journey.html" style="color:var(--accent2)">Canvas Journey</a></strong> for full UI details. Here we cover just the AR-specific bits.</div>
+  </div>
+
+  <div class="card">
+    <p><strong>Hierarchy</strong> &mdash; AR setup + UI Canvas:</p>
+    <div class="hierarchy">
+      <div class="hierarchy-title">Hierarchy</div>
+      <div class="hierarchy-item"><span class="indent" style="width:0"></span>&#9670; AR Session</div>
+      <div class="hierarchy-item"><span class="indent" style="width:0"></span>&#9670; XR Origin</div>
+      <div class="hierarchy-item"><span class="indent" style="width:16px"></span>&#128247; AR Camera</div>
+      <div class="hierarchy-item"><span class="indent" style="width:16px"></span>+ AR Plane Manager</div>
+      <div class="hierarchy-item"><span class="indent" style="width:16px"></span>+ AR Raycast Manager</div>
+      <div class="hierarchy-item"><span class="indent" style="width:16px"></span>+ MultiPlacer (Script)</div>
+      <div class="hierarchy-item selected"><span class="indent" style="width:0"></span>&#9634; Canvas [Screen Space - Overlay]</div>
+      <div class="hierarchy-item"><span class="indent" style="width:16px"></span>&#9634; SwitchButton</div>
+      <div class="hierarchy-item"><span class="indent" style="width:16px"></span>&#9634; ClearButton</div>
+      <div class="hierarchy-item"><span class="indent" style="width:16px"></span>&#9634; TogglePlanesButton</div>
+      <div class="hierarchy-item"><span class="indent" style="width:0"></span>&#9881; EventSystem</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p><strong>Toggle plane visibility</strong> &mdash; hide the grid once the user has placed objects:</p>
+    <div class="code-head">
+      <span class="code-label">C# &mdash; TogglePlanes.cs</span>
+      <div><button class="cbtn" onclick="copyEl('code-09')">Copy</button></div>
+    </div>
+    <pre><code id="code-09"><span class="kw">using</span> UnityEngine;
+<span class="kw">using</span> UnityEngine.XR.ARFoundation;
+
+<span class="kw">public class</span> <span class="ty">TogglePlanes</span> : <span class="ty">MonoBehaviour</span>
+{
+    <span class="ty">ARPlaneManager</span> planeManager;
+    <span class="kw">bool</span> visible = <span class="nm">true</span>;
+
+    <span class="kw">void</span> <span class="fn">Awake</span>() => planeManager =
+        FindObjectOfType&lt;<span class="ty">ARPlaneManager</span>&gt;();
+
+    <span class="kw">public void</span> <span class="fn">Toggle</span>()
+    {
+        visible = !visible;
+        <span class="kw">foreach</span> (<span class="kw">var</span> plane <span class="kw">in</span> planeManager.trackables)
+            plane.gameObject.SetActive(visible);
+        planeManager.enabled = visible;
+    }
+}</code></pre>
+  </div>
+
+  <!-- Interactive UI Overlay Demo -->
+  <div class="demo-box">
+    <div class="demo-label">LIVE PREVIEW</div>
+    <div class="phone-frame" style="width:260px">
+      <div class="phone-notch"></div>
+      <div class="phone-screen" id="arDemo09" style="cursor:crosshair;min-height:380px">
+        <div class="phone-cam-label">AR + UI OVERLAY</div>
+        <div class="ar-plane" id="plane09"></div>
+        <!-- UI Overlay buttons -->
+        <div style="position:absolute;bottom:10px;left:0;right:0;display:flex;justify-content:center;gap:6px;z-index:10;padding:0 8px">
+          <button class="btn" id="uiSwitch09" style="font-size:9px;padding:4px 8px;background:rgba(0,0,0,0.6);border-color:var(--accent)">Switch</button>
+          <button class="btn" id="uiClear09" style="font-size:9px;padding:4px 8px;background:rgba(0,0,0,0.6);border-color:#ff6b6b;color:#ff6b6b">Clear</button>
+          <button class="btn" id="uiPlanes09" style="font-size:9px;padding:4px 8px;background:rgba(0,0,0,0.6);border-color:var(--accent4);color:var(--accent4)">Planes</button>
+        </div>
+        <div style="position:absolute;top:18px;right:8px;font-family:var(--mono);font-size:8px;color:rgba(249,115,22,0.6);z-index:10" id="uiInfo09">Cube &middot; 0 placed</div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="divider"></div>
+
+<!-- ── 10 ── -->
+<section class="lesson" id="s10">
+  <div class="lesson-head"><span class="lesson-num" style="color:var(--accent4);background:rgba(52,211,153,0.12);border-color:rgba(52,211,153,0.25)">10</span><h2 class="lesson-title">Build to Phone</h2></div>
+  <div class="card">
+    <p>This is the moment of truth. AR <strong>must run on a real device</strong> &mdash; no simulator can fake a phone camera and sensors.</p>
+    <div class="warn-note"><strong>You NEED a physical device.</strong> AR does not work in the Unity Editor simulator for beginners. No shortcuts here.</div>
+  </div>
+
+  <div class="card">
+    <p><strong>Android Build Steps:</strong></p>
+    <div class="two">
+      <div>
+        <p><strong>1.</strong> File &rarr; Build Settings &rarr; <strong>Switch to Android</strong><br>
+        <strong>2.</strong> Player Settings &rarr; Company Name, Product Name<br>
+        <strong>3.</strong> Minimum API Level: <strong>Android 7.0 (API 24)</strong><br>
+        <strong>4.</strong> Scripting Backend: <strong>IL2CPP</strong><br>
+        <strong>5.</strong> Target Architectures: <strong>ARM64</strong></p>
+      </div>
+      <div>
+        <p><strong>6.</strong> Connect phone via USB<br>
+        <strong>7.</strong> Enable <strong>Developer Mode</strong> on phone<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;Settings &rarr; About Phone &rarr; tap Build Number 7 times<br>
+        <strong>8.</strong> Enable <strong>USB Debugging</strong><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;Settings &rarr; Developer Options &rarr; USB Debugging<br>
+        <strong>9.</strong> <strong>Build And Run</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p><strong>iOS Build Steps:</strong></p>
+    <div class="two">
+      <div>
+        <p><strong>1.</strong> File &rarr; Build Settings &rarr; <strong>Switch to iOS</strong><br>
+        <strong>2.</strong> Player Settings &rarr; Bundle Identifier<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<code style="font-size:11px;color:var(--accent)">com.yourname.arapp</code><br>
+        <strong>3.</strong> Camera Usage Description:<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<code style="font-size:11px;color:var(--accent)">"Required for AR"</code></p>
+      </div>
+      <div>
+        <p><strong>4.</strong> Click <strong>Build</strong> &rarr; opens Xcode project<br>
+        <strong>5.</strong> In Xcode: sign with Apple Developer account<br>
+        <strong>6.</strong> Connect iPhone, select as target<br>
+        <strong>7.</strong> Build and run from Xcode</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p><strong>Troubleshooting Checklist:</strong></p>
+    <table class="compare-table">
+      <thead><tr><th>Problem</th><th>Likely Cause</th><th>Fix</th></tr></thead>
+      <tbody>
+        <tr><td>Black screen</td><td>Missing AR components</td><td>Check AR Session + AR Camera exist</td></tr>
+        <tr><td>No planes detected</td><td>Phone can't see surfaces</td><td>Move slowly over flat surfaces, ensure good lighting</td></tr>
+        <tr><td>App crashes on launch</td><td>Wrong API level</td><td>Minimum API 24 for Android, iOS 12.0</td></tr>
+        <tr><td>Objects floating</td><td>AR Raycast miss</td><td>Ensure raycast hits PlaneWithinPolygon</td></tr>
+        <tr><td>Slow / laggy</td><td>Too many planes</td><td>Disable plane detection after placing objects</td></tr>
+        <tr><td>Touch not working</td><td>UI blocking touches</td><td>Check EventSystem + Canvas raycast settings</td></tr>
+      </tbody>
+    </table>
+    <div class="success-note"><strong>When it works:</strong> you'll see your virtual objects sitting on your real desk, floor, or table through your phone camera. That's augmented reality!</div>
+  </div>
+</section>
+
+</div>
+
+
+
+<!-- ══ CHECKLIST ══ -->
+<div class="checklist" id="checklist">
+  <div class="checklist-card">
+    <h2>Your Unity AR Checklist</h2>
+    <div class="checklist-item" data-check="0"><input type="checkbox"> Created AR project with AR Foundation + ARCore/ARKit packages installed</div>
+    <div class="checklist-item" data-check="1"><input type="checkbox"> Configured XR Plug-in Management for target platform</div>
+    <div class="checklist-item" data-check="2"><input type="checkbox"> Set up AR Session + XR Origin + AR Camera</div>
+    <div class="checklist-item" data-check="3"><input type="checkbox"> Enabled plane detection with AR Plane Manager</div>
+    <div class="checklist-item" data-check="4"><input type="checkbox"> Placed objects on detected planes with AR Raycast</div>
+    <div class="checklist-item" data-check="5"><input type="checkbox"> Added touch input handling with phase detection</div>
+    <div class="checklist-item" data-check="6"><input type="checkbox"> Implemented pinch-to-scale and twist-to-rotate</div>
+    <div class="checklist-item" data-check="7"><input type="checkbox"> Placed multiple objects with type switching</div>
+    <div class="checklist-item" data-check="8"><input type="checkbox"> Combined AR and Physics raycasts for select + place</div>
+    <div class="checklist-item" data-check="9"><input type="checkbox"> Added UI overlay for AR controls</div>
+    <div class="checklist-item" data-check="10"><input type="checkbox"> Built to a real phone and tested</div>
+  </div>
+</div>
+
+<footer>Immersive Environments &middot; Week 9 &middot; AR Journey</footer>
+
+<!-- ═══════════ JAVASCRIPT ═══════════ -->
+<script>
+(function(){
+
+/* ── Copy Button ── */
+window.copyEl = function(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  var text = el.textContent || el.innerText;
+  navigator.clipboard.writeText(text).then(function() {
+    var btns = document.querySelectorAll('.cbtn');
+    btns.forEach(function(b) {
+      if (b.getAttribute('onclick') && b.getAttribute('onclick').indexOf(id) !== -1) {
+        b.classList.add('ok');
+        b.textContent = 'Copied!';
+        setTimeout(function(){ b.classList.remove('ok'); b.textContent = 'Copy'; }, 1500);
+      }
+    });
+  });
+};
+
+/* ── 00: AR Intro Demo ── */
+var plane00 = document.getElementById('plane00');
+var cube00 = document.getElementById('cube00');
+var state00 = document.getElementById('state00');
+var planeVis00 = true;
+var cubeVis00 = false;
+
+document.getElementById('togglePlane00').addEventListener('click', function() {
+  planeVis00 = !planeVis00;
+  plane00.style.opacity = planeVis00 ? '1' : '0';
+  updateState00();
+});
+
+document.getElementById('toggleCube00').addEventListener('click', function() {
+  cubeVis00 = !cubeVis00;
+  cube00.style.display = cubeVis00 ? 'block' : 'none';
+  updateState00();
+});
+
+function updateState00() {
+  state00.textContent = 'Plane: ' + (planeVis00 ? 'visible' : 'hidden') + ' \u00b7 Object: ' + (cubeVis00 ? 'placed' : 'none');
+}
+
+/* ── 03: Plane Detection Demo ── */
+var hPlane03 = document.getElementById('hPlane03');
+var vPlane03 = document.getElementById('vPlane03');
+var planeStatus03 = document.getElementById('planeStatus03');
+var state03 = document.getElementById('state03');
+var modeBtns03 = [document.getElementById('modeH03'), document.getElementById('modeV03'), document.getElementById('modeA03')];
+
+function setPlaneMode(mode) {
+  modeBtns03.forEach(function(b) { b.classList.remove('active'); });
+  if (mode === 'h') {
+    modeBtns03[0].classList.add('active');
+    hPlane03.style.opacity = '1';
+    vPlane03.style.opacity = '0';
+    planeStatus03.textContent = 'Horizontal plane detected';
+    state03.textContent = 'Mode: Horizontal';
+  } else if (mode === 'v') {
+    modeBtns03[1].classList.add('active');
+    hPlane03.style.opacity = '0';
+    vPlane03.style.opacity = '1';
+    planeStatus03.textContent = 'Vertical plane detected';
+    state03.textContent = 'Mode: Vertical';
+  } else {
+    modeBtns03[2].classList.add('active');
+    hPlane03.style.opacity = '1';
+    vPlane03.style.opacity = '1';
+    planeStatus03.textContent = '2 planes detected';
+    state03.textContent = 'Mode: Everything';
+  }
+}
+
+modeBtns03[0].addEventListener('click', function() { setPlaneMode('h'); });
+modeBtns03[1].addEventListener('click', function() { setPlaneMode('v'); });
+modeBtns03[2].addEventListener('click', function() { setPlaneMode('a'); });
+
+/* ── 04: Place Object Demo ── */
+var arDemo04 = document.getElementById('arDemo04');
+var state04 = document.getElementById('state04');
+var placedObj04 = null;
+
+arDemo04.addEventListener('click', function(e) {
+  var rect = arDemo04.getBoundingClientRect();
+  var x = e.clientX - rect.left;
+  var y = e.clientY - rect.top;
+  // Only place on the plane area (lower portion)
+  if (y < rect.height * 0.45) return;
+  if (placedObj04) { placedObj04.remove(); }
+  var obj = document.createElement('div');
+  obj.className = 'ar-object ar-cube';
+  obj.style.left = (x - 15) + 'px';
+  obj.style.top = (y - 30) + 'px';
+  obj.style.position = 'absolute';
+  arDemo04.appendChild(obj);
+  placedObj04 = obj;
+  state04.textContent = 'Cube placed at (' + Math.round(x) + ', ' + Math.round(y) + ')';
+});
+
+document.getElementById('clearBtn04').addEventListener('click', function() {
+  if (placedObj04) { placedObj04.remove(); placedObj04 = null; }
+  state04.textContent = 'Tap the surface to place a cube';
+});
+
+/* ── 05: Touch Input Demo ── */
+var touchArea = document.getElementById('touchArea');
+var touchDot = document.getElementById('touchDot');
+var touchPhaseEl = document.getElementById('touchPhase');
+var touchPosEl = document.getElementById('touchPos');
+var touchDeltaEl = document.getElementById('touchDelta');
+var lastTouchX = 0, lastTouchY = 0;
+var trails05 = [];
+
+function addTrail(x, y) {
+  var t = document.createElement('div');
+  t.className = 'touch-trail';
+  t.style.left = x + 'px';
+  t.style.top = y + 'px';
+  touchArea.appendChild(t);
+  trails05.push(t);
+  if (trails05.length > 40) {
+    var old = trails05.shift();
+    old.remove();
+  }
+}
+
+touchArea.addEventListener('mousedown', function(e) {
+  var rect = touchArea.getBoundingClientRect();
+  var x = e.clientX - rect.left;
+  var y = e.clientY - rect.top;
+  touchDot.style.left = x + 'px';
+  touchDot.style.top = y + 'px';
+  touchDot.style.opacity = '1';
+  touchPhaseEl.textContent = 'Began';
+  touchPosEl.textContent = Math.round(x) + ', ' + Math.round(y);
+  touchDeltaEl.textContent = '0, 0';
+  lastTouchX = x;
+  lastTouchY = y;
+});
+
+touchArea.addEventListener('mousemove', function(e) {
+  if (e.buttons !== 1) return;
+  var rect = touchArea.getBoundingClientRect();
+  var x = e.clientX - rect.left;
+  var y = e.clientY - rect.top;
+  touchDot.style.left = x + 'px';
+  touchDot.style.top = y + 'px';
+  touchPhaseEl.textContent = 'Moved';
+  touchPosEl.textContent = Math.round(x) + ', ' + Math.round(y);
+  touchDeltaEl.textContent = Math.round(x - lastTouchX) + ', ' + Math.round(y - lastTouchY);
+  addTrail(x, y);
+  lastTouchX = x;
+  lastTouchY = y;
+});
+
+touchArea.addEventListener('mouseup', function() {
+  touchDot.style.opacity = '0.4';
+  touchPhaseEl.textContent = 'Ended';
+  touchDeltaEl.textContent = '0, 0';
+  trails05.forEach(function(t) { t.remove(); });
+  trails05 = [];
+});
+
+touchArea.addEventListener('mouseleave', function() {
+  touchDot.style.opacity = '0';
+  touchPhaseEl.textContent = '--';
+  trails05.forEach(function(t) { t.remove(); });
+  trails05 = [];
+});
+
+/* ── 06: Scale & Rotate Demo ── */
+var srObject = document.getElementById('srObject');
+var srScale = document.getElementById('srScale');
+var srRotate = document.getElementById('srRotate');
+var srScaleVal = document.getElementById('srScaleVal');
+var srRotateVal = document.getElementById('srRotateVal');
+
+function updateSR() {
+  var s = srScale.value / 60;
+  var r = srRotate.value;
+  srObject.style.width = srScale.value + 'px';
+  srObject.style.height = srScale.value + 'px';
+  srObject.style.transform = 'rotate(' + r + 'deg)';
+  srScaleVal.textContent = s.toFixed(1) + 'x';
+  srRotateVal.textContent = r + '\u00b0';
+}
+
+srScale.addEventListener('input', updateSR);
+srRotate.addEventListener('input', updateSR);
+
+/* ── 07: Multi-Placer Demo ── */
+var arDemo07 = document.getElementById('arDemo07');
+var state07 = document.getElementById('state07');
+var currentShape07 = 'cube';
+var placed07 = [];
+var shapeBtns07 = document.querySelectorAll('#shapeCube07, #shapeSphere07, #shapeCylinder07');
+
+var shapeColors = { cube: 'var(--accent)', sphere: 'var(--accent2)', cylinder: 'var(--accent4)' };
+var shapeClasses = { cube: 'ar-cube', sphere: 'ar-sphere', cylinder: 'ar-cylinder' };
+
+shapeBtns07.forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    shapeBtns07.forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    currentShape07 = btn.getAttribute('data-shape');
+    updateState07();
+  });
+});
+
+arDemo07.addEventListener('click', function(e) {
+  var rect = arDemo07.getBoundingClientRect();
+  var x = e.clientX - rect.left;
+  var y = e.clientY - rect.top;
+  if (y < rect.height * 0.4) return;
+  var obj = document.createElement('div');
+  obj.className = 'ar-object ' + shapeClasses[currentShape07];
+  obj.style.position = 'absolute';
+  obj.style.left = (x - 15) + 'px';
+  obj.style.top = (y - 30) + 'px';
+  obj.style.width = (18 + Math.random() * 14) + 'px';
+  obj.style.height = obj.style.width;
+  arDemo07.appendChild(obj);
+  placed07.push(obj);
+  updateState07();
+});
+
+document.getElementById('clearAll07').addEventListener('click', function() {
+  placed07.forEach(function(o) { o.remove(); });
+  placed07 = [];
+  updateState07();
+});
+
+function updateState07() {
+  var name = currentShape07.charAt(0).toUpperCase() + currentShape07.slice(1);
+  state07.textContent = 'Objects: ' + placed07.length + ' \u00b7 Shape: ' + name;
+}
+
+/* ── 09: UI Overlay Demo ── */
+var arDemo09 = document.getElementById('arDemo09');
+var plane09 = document.getElementById('plane09');
+var uiInfo09 = document.getElementById('uiInfo09');
+var currentShape09 = 'cube';
+var shapes09 = ['cube', 'sphere', 'cylinder'];
+var shapeIdx09 = 0;
+var placed09 = [];
+var planeVis09 = true;
+
+arDemo09.addEventListener('click', function(e) {
+  if (e.target.tagName === 'BUTTON') return;
+  var rect = arDemo09.getBoundingClientRect();
+  var x = e.clientX - rect.left;
+  var y = e.clientY - rect.top;
+  if (y < rect.height * 0.35 || y > rect.height * 0.85) return;
+  var obj = document.createElement('div');
+  obj.className = 'ar-object ' + shapeClasses[currentShape09];
+  obj.style.position = 'absolute';
+  obj.style.left = (x - 12) + 'px';
+  obj.style.top = (y - 24) + 'px';
+  obj.style.width = (14 + Math.random() * 10) + 'px';
+  obj.style.height = obj.style.width;
+  obj.style.zIndex = '3';
+  arDemo09.appendChild(obj);
+  placed09.push(obj);
+  updateUI09();
+});
+
+document.getElementById('uiSwitch09').addEventListener('click', function(e) {
+  e.stopPropagation();
+  shapeIdx09 = (shapeIdx09 + 1) % shapes09.length;
+  currentShape09 = shapes09[shapeIdx09];
+  updateUI09();
+});
+
+document.getElementById('uiClear09').addEventListener('click', function(e) {
+  e.stopPropagation();
+  placed09.forEach(function(o) { o.remove(); });
+  placed09 = [];
+  updateUI09();
+});
+
+document.getElementById('uiPlanes09').addEventListener('click', function(e) {
+  e.stopPropagation();
+  planeVis09 = !planeVis09;
+  plane09.style.opacity = planeVis09 ? '1' : '0';
+  updateUI09();
+});
+
+function updateUI09() {
+  var name = currentShape09.charAt(0).toUpperCase() + currentShape09.slice(1);
+  uiInfo09.textContent = name + ' \u00b7 ' + placed09.length + ' placed';
+}
+
+/* ── Checklist ── */
+document.querySelectorAll('.checklist-item').forEach(function(item) {
+  var cb = item.querySelector('input[type="checkbox"]');
+  item.addEventListener('click', function(e) {
+    if (e.target !== cb) cb.checked = !cb.checked;
+    item.classList.toggle('checked', cb.checked);
+  });
+});
+
+/* ── Nav pill active state on scroll ── */
+var sections = document.querySelectorAll('.lesson');
+var navLinks = document.querySelectorAll('.nav a');
+
+function updateNav() {
+  var scrollY = window.scrollY + 120;
+  sections.forEach(function(s) {
+    var top = s.offsetTop;
+    var bottom = top + s.offsetHeight;
+    var id = s.id;
+    navLinks.forEach(function(link) {
+      if (link.getAttribute('href') === '#' + id) {
+        link.classList.toggle('active', scrollY >= top && scrollY < bottom);
+      }
+    });
+  });
+}
+
+var scrollTimer;
+window.addEventListener('scroll', function() {
+  clearTimeout(scrollTimer);
+  scrollTimer = setTimeout(updateNav, 50);
+});
+
+})();
+</script>
+</body>
+</html>
