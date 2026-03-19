@@ -31,11 +31,15 @@ public class PlayerController : MonoBehaviour
         HandleMouseLook();
         HandleMovement();
 
-        // Press Escape to unlock cursor
+        // Press Escape to quit game (in build) or unlock cursor (in editor)
         if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
         {
+            #if UNITY_EDITOR
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
+            #else
+            Application.Quit();
+            #endif
         }
 
         // Click to re-lock cursor
