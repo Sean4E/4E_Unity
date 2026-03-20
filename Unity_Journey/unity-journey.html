@@ -480,13 +480,14 @@ footer{text-align:center;padding:36px 24px;color:var(--dim);font-family:var(--mo
 
   <div class="card">
     <h3 style="color:var(--accent);margin-bottom:8px">Set the Background Colour</h3>
-    <p>In Three.js: <code>scene.background = new THREE.Color(0x1a1a2e)</code>. In Unity:</p>
+    <p>In Three.js: <code>scene.background = new THREE.Color(0x1a1a2e)</code>. In Unity (URP):</p>
     <ol class="steps">
       <li>Select the <strong>Camera</strong> (child of Player)</li>
-      <li>In the Inspector, find <strong>Clear Flags</strong> &rarr; set to <strong>Solid Color</strong></li>
-      <li>Click the <strong>Background</strong> colour to pick your sky colour</li>
+      <li>In the Inspector, find the <strong>Environment</strong> section on the Camera component</li>
+      <li>Set <strong>Background Type</strong> to <strong>Solid Color</strong></li>
+      <li>Click the <strong>Background</strong> colour swatch to pick your sky colour</li>
     </ol>
-    <div class="unity-note"><strong>Alternative:</strong> Use Window &rarr; Rendering &rarr; Lighting &rarr; Environment tab to set a Skybox material for a sky image instead of a flat colour.</div>
+    <div class="unity-note"><strong>Alternative:</strong> For a skybox, go to <strong>Window &rarr; Rendering &rarr; Lighting</strong> &rarr; <strong>Environment</strong> tab and assign a Skybox material. The camera's Background Type must be set to <strong>Skybox</strong> for this to work.</div>
   </div>
 
   <div class="success-note"><strong>Checkpoint:</strong> Your scene has mood. At least one directional light with shadows and 2-3 point lights. The background isn't default blue.</div>
